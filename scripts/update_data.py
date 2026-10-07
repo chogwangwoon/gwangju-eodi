@@ -32,7 +32,7 @@ TO_DATE = (NOW + timedelta(days=90)).strftime("%Y%m%d")
 TODAY_ISO = NOW.strftime("%Y-%m-%d")
 
 # TourAPI 지역코드: 광주광역시 5 / 전라남도 38
-TOUR_AREAS = [("광주", "5"), ("전남", "38")]
+TOUR_AREAS = [("광주", "5")]
 
 # KOPIS 지역(시도)코드: 광주광역시 29 / 전라남도 46
 KOPIS_AREAS = [("광주", "29"), ("전남", "46")]
