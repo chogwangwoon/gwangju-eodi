@@ -1,0 +1,23 @@
+{
+  "updated_at": "2026-10-07T18:00:50+09:00",
+  "auto_update": true,
+  "manual_count": 75,
+  "events_count": 71,
+  "api_status": [
+    {
+      "id": "tourapi",
+      "name": "한국관광공사 행사",
+      "ok": false,
+      "count": 0,
+      "message": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "kopis",
+      "name": "KOPIS 공연",
+      "ok": true,
+      "count": 0,
+      "message": "정상 수집"
+    }
+  ],
+  "note": "수동 데이터 우선 병합 · API 실패 시 기존 배포 데이터 유지"
+}
