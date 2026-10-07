@@ -131,7 +131,7 @@ def tourapi_festivals():
             "MobileOS": "ETC",
             "MobileApp": "gwangju-eodi",
             "_type": "json",
-            "numOfRows": "100",
+            "numOfRows": "1000",
             "pageNo": "1",
             "arrange": "A",
             #"areaCode": area_code,
