@@ -1408,31 +1408,6 @@
     "venueId": "kdj"
   },
   {
-    "id": "kopis-PF302712",
-    "apiId": "PF302712",
-    "category": "공연",
-    "subtype": "연극",
-    "title": "김성녀의 마당놀이: 심청이와 춘향이가 온다 [광양]",
-    "venue": "광양시문화예술회관",
-    "district": "",
-    "date": "2026-10-23 ~ 2026-10-23",
-    "time": "KOPIS 상세 확인",
-    "price": "KOPIS 상세 확인",
-    "status": "공연예정",
-    "start": "2026-10-23",
-    "end": "2026-10-23",
-    "image": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF302712_261007_134459.jpg",
-    "source": "KOPIS 공연예술통합전산망",
-    "url": "https://www.kopis.or.kr/por/db/pblprfr/pblprfrView.do?menuId=MNU_00020&mt20Id=PF302712",
-    "origin": "kopis",
-    "verified": "2026-10-08",
-    "tags": [
-      "공연",
-      "연극",
-      "전국"
-    ]
-  },
-  {
     "id": "mp-gukhyang-2026",
     "category": "축제",
     "subtype": "국화축제",
@@ -1673,56 +1648,6 @@
       "checked": "2026-10-07"
     },
     "venueId": "jeonnam-dragons"
-  },
-  {
-    "id": "kopis-PF302673",
-    "apiId": "PF302673",
-    "category": "공연",
-    "subtype": "한국음악(국악)",
-    "title": "이희문 프로젝트: 날 [광주]",
-    "venue": "전남광주통합특별시 예술의전당 (구. 광주예술의전당)",
-    "district": "",
-    "date": "2026-10-28 ~ 2026-10-28",
-    "time": "KOPIS 상세 확인",
-    "price": "KOPIS 상세 확인",
-    "status": "공연예정",
-    "start": "2026-10-28",
-    "end": "2026-10-28",
-    "image": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF302673_261007_112525.jpg",
-    "source": "KOPIS 공연예술통합전산망",
-    "url": "https://www.kopis.or.kr/por/db/pblprfr/pblprfrView.do?menuId=MNU_00020&mt20Id=PF302673",
-    "origin": "kopis",
-    "verified": "2026-10-08",
-    "tags": [
-      "공연",
-      "한국음악(국악)",
-      "전국"
-    ]
-  },
-  {
-    "id": "kopis-PF302698",
-    "apiId": "PF302698",
-    "category": "공연",
-    "subtype": "한국음악(국악)",
-    "title": "숲속음악대 덩따쿵 [완도]",
-    "venue": "완도문화예술의전당",
-    "district": "",
-    "date": "2026-10-29 ~ 2026-10-29",
-    "time": "KOPIS 상세 확인",
-    "price": "KOPIS 상세 확인",
-    "status": "공연예정",
-    "start": "2026-10-29",
-    "end": "2026-10-29",
-    "image": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF302698_261007_131518.jpg",
-    "source": "KOPIS 공연예술통합전산망",
-    "url": "https://www.kopis.or.kr/por/db/pblprfr/pblprfrView.do?menuId=MNU_00020&mt20Id=PF302698",
-    "origin": "kopis",
-    "verified": "2026-10-08",
-    "tags": [
-      "공연",
-      "한국음악(국악)",
-      "전국"
-    ]
   },
   {
     "id": "daein-night-20261030",
@@ -2308,31 +2233,6 @@
     "lng": 126.8813878,
     "image": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201200%20675%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%235c2e38%22/%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23be8a73%22/%3E%0A%20%20%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3C/defs%3E%0A%20%20%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url%28%23g%29%22/%3E%0A%20%20%20%20%3Cg%20opacity%3D%22.12%22%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%221010%22%20cy%3D%22140%22%20r%3D%22180%22%20fill%3D%22%23fff%22/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22180%22%20cy%3D%22600%22%20r%3D%22220%22%20fill%3D%22%23fff%22/%3E%0A%20%20%20%20%20%20%3Cpath%20d%3D%22M0%20540%20C250%20440%20400%20660%20670%20560%20C850%20492%201030%20430%201200%20500%20L1200%20675%20L0%20675%20Z%22%20fill%3D%22%23fff%22/%3E%0A%20%20%20%20%3C/g%3E%0A%20%20%20%20%3Cg%20opacity%3D%22.22%22%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22820%22%20y%3D%2288%22%20width%3D%22250%22%20height%3D%22250%22%20rx%3D%2242%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22/%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22770%22%20y%3D%22390%22%20width%3D%22360%22%20height%3D%22170%22%20rx%3D%2234%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22/%3E%0A%20%20%20%20%3C/g%3E%0A%20%20%20%20%3Crect%20x%3D%2286%22%20y%3D%2286%22%20width%3D%22140%22%20height%3D%2246%22%20rx%3D%2223%22%20fill%3D%22rgba%28255%2C255%2C255%2C.18%29%22%20stroke%3D%22rgba%28255%2C255%2C255%2C.4%29%22/%3E%3Ctext%20x%3D%22108%22%20y%3D%22116%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2224%22%20font-weight%3D%22800%22%20fill%3D%22%23fff%22%3E%EA%B3%B5%EC%97%B0%C2%B7%EC%A0%84%EC%8B%9C%3C/text%3E%0A%20%20%20%20%3Ctext%20x%3D%2286%22%20y%3D%22180%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2272%22%20font-weight%3D%22800%22%20fill%3D%22%23ffffff%22%3E2026%20V.O.S%20%EC%A0%84%EA%B5%AD%ED%88%AC%EC%96%B4%3C/text%3E%3Ctext%20x%3D%2286%22%20y%3D%22258%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2272%22%20font-weight%3D%22800%22%20fill%3D%22%23ffffff%22%3E%EC%BD%98%EC%84%9C%ED%8A%B8%20%E3%80%88%EC%A0%9C2%ED%9A%8C%20%EB%8F%99%EC%B0%BD%ED%9A%8C%E3%80%89%20-%20%EA%B4%91%EC%A3%BC%3C/text%3E%0A%20%20%20%20%3Ctext%20x%3D%2288%22%20y%3D%22500%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2227%22%20font-weight%3D%22700%22%20fill%3D%22rgba%28255%2C255%2C255%2C.92%29%22%3E%EA%B4%91%EC%A3%BC%EC%98%88%EC%88%A0%EC%9D%98%EC%A0%84%EB%8B%B9%3C/text%3E%0A%20%20%20%20%3Ctext%20x%3D%2288%22%20y%3D%22584%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2223%22%20font-weight%3D%22700%22%20fill%3D%22rgba%28255%2C255%2C255%2C.84%29%22%3E%EC%95%88%EB%82%B4%EC%9A%A9%20%EB%B9%84%EC%A3%BC%EC%96%BC%20%C2%B7%20%EC%8B%A4%EC%A0%9C%20%ED%98%84%EC%9E%A5/%ED%8F%AC%EC%8A%A4%ED%84%B0%EC%99%80%20%EB%8B%A4%EB%A5%BC%20%EC%88%98%20%EC%9E%88%EC%9D%8C%3C/text%3E%0A%20%20%20%20%3C/svg%3E",
     "imageCredit": "광주예술의전당 행사 안내용 비주얼"
-  },
-  {
-    "id": "kopis-PF302746",
-    "apiId": "PF302746",
-    "category": "공연",
-    "subtype": "대중음악",
-    "title": "V.O.S 전국투어 콘서트: 제2회 동창회 [전남광주]",
-    "venue": "전남광주통합특별시 예술의전당 (구. 광주예술의전당)",
-    "district": "",
-    "date": "2026-11-22 ~ 2026-11-22",
-    "time": "KOPIS 상세 확인",
-    "price": "KOPIS 상세 확인",
-    "status": "공연예정",
-    "start": "2026-11-22",
-    "end": "2026-11-22",
-    "image": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF302746_261007_150513.gif",
-    "source": "KOPIS 공연예술통합전산망",
-    "url": "https://www.kopis.or.kr/por/db/pblprfr/pblprfrView.do?menuId=MNU_00020&mt20Id=PF302746",
-    "origin": "kopis",
-    "verified": "2026-10-08",
-    "tags": [
-      "공연",
-      "대중음악",
-      "전국"
-    ]
   },
   {
     "id": "dragons-ansan-20261122",
