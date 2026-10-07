@@ -194,7 +194,7 @@ def kopis_performances():
     out = []
     base = "http://www.kopis.or.kr/openApi/restful/pblprfr"
 
-    for area_name, code in [("전국", "")] 
+    for area_name, code in [("전국", "")]: 
         params = {
             "service": KOPIS_KEY,
             "stdate": TODAY,
