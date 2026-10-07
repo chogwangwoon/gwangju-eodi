@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T06:39:11+09:00",
+  "updated_at": "2026-10-08T06:47:47+09:00",
   "auto_update": true,
   "manual_count": 75,
   "events_count": 71,
@@ -8,7 +8,7 @@
       "id": "tourapi",
       "name": "한국관광공사 행사",
       "ok": true,
-      "count": 0,
+      "count": 1,
       "message": "정상 수집"
     },
     {
