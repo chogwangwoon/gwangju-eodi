@@ -28,7 +28,9 @@ KOPIS_KEY = os.environ.get("KOPIS_API_KEY", "").strip()
 KST = timezone(timedelta(hours=9))
 NOW = datetime.now(KST)
 TODAY = "20260101"
-TO_DATE = "20260101"
+TO_DATE = "20261231"
+KOPIS_FROM = NOW.strftime("%Y%m%d")
+KOPIS_TO = (NOW + timedelta(days=30)).strftime("%Y%m%d")
 TODAY_ISO = NOW.strftime("%Y-%m-%d")
 
 # TourAPI 지역코드: 광주광역시 5 / 전라남도 38
@@ -199,8 +201,8 @@ def kopis_performances():
     for area_name, code in [("전국", "")]: 
         params = {
             "service": KOPIS_KEY,
-            "stdate": TODAY,
-            "eddate": TO_DATE,
+            "stdate": KOPIS_FROM
+            "eddate": KOPIS_TO,
             "cpage": "1",
             "rows": "100",
            # "signgucode": code,
