@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-10-07T18:10:03+09:00",
+  "updated_at": "2026-10-07T18:22:47+09:00",
   "auto_update": true,
   "manual_count": 75,
-  "events_count": 71,
+  "events_count": 171,
   "api_status": [
     {
       "id": "tourapi",
@@ -15,7 +15,7 @@
       "id": "kopis",
       "name": "KOPIS 공연",
       "ok": true,
-      "count": 0,
+      "count": 200,
       "message": "정상 수집"
     }
   ],
