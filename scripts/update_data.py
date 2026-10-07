@@ -201,7 +201,7 @@ def kopis_performances():
     for area_name, code in [("전국", "")]: 
         params = {
             "service": KOPIS_KEY,
-            "stdate": KOPIS_FROM
+            "stdate": KOPIS_FROM,
             "eddate": KOPIS_TO,
             "cpage": "1",
             "rows": "100",
