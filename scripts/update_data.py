@@ -22,7 +22,7 @@ DATA_DIR = ROOT / "docs" / "data"
 OUT_EVENTS = DATA_DIR / "events.json"
 OUT_META = DATA_DIR / "meta.json"
 
-DATA_KEY = os.environ.get("DATA_GO_KR_KEY", "").strip()
+DATA_KEY = urllib.parse.unquote( os.environ.get("DATA_GO_KR_KEY", "").strip())
 KOPIS_KEY = os.environ.get("KOPIS_API_KEY", "").strip()
 
 KST = timezone(timedelta(hours=9))
