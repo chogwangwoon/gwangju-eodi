@@ -194,7 +194,7 @@ def kopis_performances():
     out = []
     base = "http://www.kopis.or.kr/openApi/restful/pblprfr"
 
-    for area_name, code in KOPIS_AREAS:
+    for area_name, code in [("전국", "")] 
         params = {
             "service": KOPIS_KEY,
             "stdate": TODAY,
@@ -216,7 +216,10 @@ def kopis_performances():
             end = ymd(get("prfpdto")) or start
             genre = get("genrenm") or "공연"
             venue = get("fcltynm")
+            area = get("area")
 
+            if "광주" not in area and "전남" not in area and "전라남" not in area:
+             continue
             out.append({
                 "id": f"kopis-{mid}",
                 "apiId": mid,
