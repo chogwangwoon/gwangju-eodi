@@ -1,22 +1,22 @@
 {
-  "updated_at": "2026-10-08T06:51:03+09:00",
+  "updated_at": "2026-10-08T07:04:43+09:00",
   "auto_update": true,
   "manual_count": 75,
-  "events_count": 71,
+  "events_count": 107,
   "api_status": [
     {
       "id": "tourapi",
       "name": "한국관광공사 행사",
       "ok": true,
-      "count": 1,
+      "count": 65,
       "message": "정상 수집"
     },
     {
       "id": "kopis",
       "name": "KOPIS 공연",
-      "ok": false,
-      "count": 0,
-      "message": "HTTP Error 400: Bad Request"
+      "ok": true,
+      "count": 5,
+      "message": "정상 수집"
     }
   ],
   "note": "수동 데이터 우선 병합 · API 실패 시 기존 배포 데이터 유지"
