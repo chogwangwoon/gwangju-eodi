@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T18:00:50+09:00",
+  "updated_at": "2026-10-07T18:10:03+09:00",
   "auto_update": true,
   "manual_count": 75,
   "events_count": 71,
@@ -7,9 +7,9 @@
     {
       "id": "tourapi",
       "name": "한국관광공사 행사",
-      "ok": false,
+      "ok": true,
       "count": 0,
-      "message": "HTTP Error 403: Forbidden"
+      "message": "정상 수집"
     },
     {
       "id": "kopis",
