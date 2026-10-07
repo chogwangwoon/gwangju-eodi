@@ -187,7 +187,7 @@ def tourapi_festivals():
                 "url": "",
                 "origin": "tourapi",
                 "verified": TODAY_ISO,
-                "tags": ["축제", area_name],
+               "tags": ["축제", "광주" if "광주광역시" in addr else "전남"],
             })
     return out
 
