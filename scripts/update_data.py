@@ -134,7 +134,7 @@ def tourapi_festivals():
             "numOfRows": "100",
             "pageNo": "1",
             "arrange": "A",
-            "areaCode": area_code,
+            #"areaCode": area_code,
             "eventStartDate": TODAY,
             "eventEndDate": TO_DATE,
         }
@@ -159,6 +159,8 @@ def tourapi_festivals():
             start = ymd(x.get("eventstartdate"))
             end = ymd(x.get("eventenddate")) or start
             addr = (x.get("addr1") or "").strip()
+            if not ("광주" in addr or "전남" in addr or "전라남도" in addr):
+             continue
             content_id = str(x.get("contentid") or "")
             out.append({
                 "id": f"tour-{content_id}",
