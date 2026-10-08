@@ -246,7 +246,7 @@ def kopis_performances():
                 "tags": ["공연", genre, area_name],
             })
     return out
- def smart_event_key(e):
+def smart_event_key(e):
     title = norm_title(e.get("title", ""))
 
     # 행사명 앞에 붙는 회차/연도 표현 제거
@@ -256,8 +256,7 @@ def kopis_performances():
     start = e.get("start", "")
     end = e.get("end", "")
 
-    # 장소명도 너무 길지 않게 보조 기준으로 사용
-   return f"{title}:{start}:{end}"
+    return f"{title}:{start}:{end}"
 def merge_events(manual, api_events):
        merged, seen = [], set()
     # 수동 데이터가 앞에 있으므로 같은 항목이면 수동 데이터가 우선.
