@@ -121,6 +121,30 @@ def dedup_key(e):
     if api_id:
         return f"{e.get('origin','api')}:{api_id}"
     return f"{norm_title(e.get('title',''))}:{e.get('start','')}"
+    def clean_api_text(value):
+    if not value:
+        return ""
+
+    text = str(value)
+    text = re.sub(r"<br\s*/?>", " / ", text, flags=re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = text.replace("&nbsp;", " ")
+    text = re.sub(r"\s+", " ", text)
+
+    return text.strip()
+
+
+def extract_api_url(value):
+    if not value:
+        return ""
+
+    text = str(value).strip()
+
+    match = re.search(r'href=["\']([^"\']+)["\']', text, flags=re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+
+    return text
 def tourapi_detail_intro(content_id, content_type_id="15"):
 
     params = {
@@ -250,8 +274,15 @@ def tourapi_festivals():
                 "district": district_from_addr(addr),
                 "address": addr,
                 "date": f"{start or ''} ~ {end or ''}".strip(" ~"),
-                "time": (intro.get("playtime") or "공식 상세 확인").strip(),
-                "price": (intro.get("usetimefestival") or "공식 상세 확인").strip(),
+                "time": clean_api_text(intro.get("playtime")) or "공식 상세 확인",
+                "price": clean_api_text(intro.get("usetimefestival")) or "공식 상세 확인",
+                "age": clean_api_text(intro.get("agelimit")),
+                "program": clean_api_text(intro.get("program")),
+                "booking": clean_api_text(intro.get("bookingplace")),
+                "parking": clean_api_text(intro.get("parking")),
+                "spendtime": clean_api_text(intro.get("spendtimefestival")),
+                "sponsor": clean_api_text(intro.get("sponsor1") or intro.get("sponsor2")),
+                "parking": (intro.get("parking") or "").strip(),
                 "status": "예정" if start and start > TODAY_ISO else "진행중",
                 "start": start,
                 "end": end,
@@ -259,9 +290,9 @@ def tourapi_festivals():
                 "lat": float(x["mapy"]) if x.get("mapy") else None,
                 "lng": float(x["mapx"]) if x.get("mapx") else None,
                 "contact": intro.get("sponsor1tel") or intro.get("sponsor2tel") or x.get("tel") or "",
-                "description": (common.get("overview") or "").strip(),
+                "description": clean_api_text(common.get("overview")),
                 "source": "한국관광공사 TourAPI",
-                "url": (intro.get("eventhomepage") or common.get("homepage") or "").strip(),
+                "url": extract_api_url(intro.get("eventhomepage") or common.get("homepage")),
                 "origin": "tourapi",
                 "verified": TODAY_ISO,
                "tags": ["축제", "광주" if "광주광역시" in addr else "전남"],
