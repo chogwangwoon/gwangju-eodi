@@ -1026,14 +1026,14 @@ small,.gu,.kind,.tag{letter-spacing:0}
 /* ── 크리밍 메인 노출 강화 ── */
 .decisionHeroRow{display:flex;align-items:flex-end;justify-content:space-between;gap:18px}
 .decisionHeroText{flex:1;min-width:0}
-.heroCreaming{flex:0 0 138px;display:flex;justify-content:flex-end;align-self:flex-end}
-.heroCreamingCard{position:relative;width:132px;height:132px;border-radius:28px;background:linear-gradient(180deg,#fff9f2 0%,#fff4ec 100%);border:1px solid rgba(239,107,74,.18);box-shadow:0 14px 32px rgba(84,56,39,.12);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.heroCreaming{flex:0 0 238px;display:flex;justify-content:flex-end;align-self:flex-end;padding-left:100px}
+.heroCreamingCard{position:relative;width:132px;height:132px;border-radius:28px;background:linear-gradient(180deg,#fff9f2 0%,#fff4ec 100%);border:1px solid rgba(239,107,74,.18);box-shadow:0 14px 32px rgba(84,56,39,.12);display:flex;align-items:flex-end;justify-content:center;overflow:visible}
 .heroCreamingCard::after{content:"";position:absolute;inset:auto 16px 12px 16px;height:20px;border-radius:999px;background:radial-gradient(ellipse at center, rgba(239,107,74,.16), rgba(239,107,74,0));filter:blur(4px)}
 .heroCreamingCard img{position:relative;z-index:1;width:88px;height:auto;transform-origin:center bottom;animation:creamingFloat 3.2s ease-in-out infinite}
-.heroCreamingBubble{position:absolute;left:10px;top:10px;z-index:2;max-width:88px;background:#fff;border:1px solid rgba(239,107,74,.18);color:#9b4b34;border-radius:14px;padding:6px 8px;font-size:11px;line-height:1.35;font-weight:800;box-shadow:0 8px 18px rgba(84,56,39,.08)}
-.heroCreamingBubble::after{content:"";position:absolute;right:14px;bottom:-6px;width:10px;height:10px;background:#fff;border-right:1px solid rgba(239,107,74,.18);border-bottom:1px solid rgba(239,107,74,.18);transform:rotate(45deg)}
+.heroCreamingBubble{position:absolute;left:-102px;top:16px;z-index:3;width:92px;max-width:92px;background:#fff;border:1px solid rgba(239,107,74,.18);color:#9b4b34;border-radius:14px;padding:7px 9px;font-size:11px;line-height:1.35;font-weight:800;box-shadow:0 8px 18px rgba(84,56,39,.08)}
+.heroCreamingBubble::after{content:"";position:absolute;right:-6px;top:28px;width:10px;height:10px;background:#fff;border-right:1px solid rgba(239,107,74,.18);border-top:1px solid rgba(239,107,74,.18);transform:rotate(45deg)}
 @keyframes creamingFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@media(max-width:899px){.decisionHeroRow{align-items:center;gap:12px}.heroCreaming{flex:0 0 92px}.heroCreamingCard{width:88px;height:88px;border-radius:22px}.heroCreamingCard img{width:63px}.heroCreamingBubble{display:none}}
+@media(max-width:899px){.decisionHeroRow{align-items:center;gap:12px}.heroCreaming{flex:0 0 92px;padding-left:0}.heroCreamingCard{width:88px;height:88px;border-radius:22px;overflow:hidden}.heroCreamingCard img{width:63px}.heroCreamingBubble{display:none}}
 
 
 /* 상세 팝업: 긴 프로그램 내용 접기/펼치기 */
@@ -2055,6 +2055,15 @@ function renderMeta() {
 
 /* ───────── 오늘의 광주: 아침에 열면 "오늘 여기 가자"가 나오도록 ───────── */
 let WEATHER = null, TODAY_SEED = 0;
+let WEATHER_RETRY_TIMER = null, WEATHER_AUTO_RETRIES = 0;
+function scheduleWeatherRetry(){
+  if (WEATHER_AUTO_RETRIES >= 3 || WEATHER_RETRY_TIMER) return;
+  WEATHER_AUTO_RETRIES += 1;
+  WEATHER_RETRY_TIMER = setTimeout(() => {
+    WEATHER_RETRY_TIMER = null;
+    if (navigator.onLine) loadWeather(true);
+  }, WEATHER_AUTO_RETRIES === 1 ? 15000 : 45000);
+}
 const WMO = c => c === 0 ? ["☀️", "맑음", false] : c <= 2 ? ["🌤", "구름 조금", false] : c === 3 ? ["☁️", "흐림", false] : c <= 48 ? ["🌫", "안개", false] : c <= 67 ? ["🌧", "비", true] : c <= 77 ? ["🌨", "눈", true] : c <= 82 ? ["🌦", "소나기", true] : ["⛈", "뇌우", true];
 async function fetchJsonWithRetry(url, { attempts = 2, timeout = 8000 } = {}) {
   let lastErr;
@@ -2151,9 +2160,9 @@ async function loadWeather(force = false) {
   try {
     let j;
     try {
-      j = await fetchJsonWithRetry(fullWeatherUrl, { attempts: 2, timeout: 7000 });
+      j = await fetchJsonWithRetry(fullWeatherUrl, { attempts: 3, timeout: 9000 });
     } catch (firstErr) {
-      j = await fetchJsonWithRetry(liteWeatherUrl, { attempts: 1, timeout: 6000 });
+      j = await fetchJsonWithRetry(liteWeatherUrl, { attempts: 2, timeout: 9000 });
     }
 
     if (!j.current || !j.daily || j.current.temperature_2m == null) {
@@ -2177,6 +2186,8 @@ async function loadWeather(force = false) {
       offline: false,
       source: "Open-Meteo"
     };
+    WEATHER_AUTO_RETRIES = 0;
+    if (WEATHER_RETRY_TIMER) { clearTimeout(WEATHER_RETRY_TIMER); WEATHER_RETRY_TIMER = null; }
 
     // 미세먼지는 부가 정보라 짧게 한 번만 요청. 실패해도 기본 날씨는 바로 보여준다.
     const airUrl =
@@ -2210,6 +2221,7 @@ async function loadWeather(force = false) {
         tipsEl.classList.remove("hidden");
         tipsEl.innerHTML = `<div class="wxFail"><div class="wtBig">🌥</div><div><b>실시간 날씨 연결이 지연되고 있어요</b><span>${esc(REGIONS[REGION].hub)} 날씨를 잠시 뒤 자동으로 다시 확인합니다.</span></div><button class="btn" onclick="loadWeather(true)">↻ 날씨 다시 불러오기</button></div>`;
       }
+      scheduleWeatherRetry();
     }
   }
 
