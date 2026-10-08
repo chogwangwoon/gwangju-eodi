@@ -1,21 +1,21 @@
 {
-  "updated_at": "2026-10-08T14:48:23+09:00",
+  "updated_at": "2026-10-08T18:24:26+09:00",
   "auto_update": true,
   "manual_count": 75,
-  "events_count": 88,
+  "events_count": 74,
   "api_status": [
     {
       "id": "tourapi",
       "name": "한국관광공사 행사",
-      "ok": true,
-      "count": 65,
-      "message": "정상 수집"
+      "ok": false,
+      "count": 0,
+      "message": "<urlopen error timed out>"
     },
     {
       "id": "kopis",
       "name": "KOPIS 공연",
       "ok": true,
-      "count": 5,
+      "count": 3,
       "message": "정상 수집"
     }
   ],
