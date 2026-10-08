@@ -243,45 +243,67 @@ def tourapi_festivals():
         raise RuntimeError("DATA_GO_KR_KEY가 없습니다.")
 
     out = []
-    for area_name, area_code in TOUR_AREAS:
+    page_no = 1
+    num_rows = 100
+
+    while True:
         params = {
             "serviceKey": DATA_KEY,
             "MobileOS": "ETC",
             "MobileApp": "gwangju-eodi",
             "_type": "json",
-            "numOfRows": "5000",
-            "pageNo": "1",
+            "numOfRows": str(num_rows),
+            "pageNo": str(page_no),
             "arrange": "A",
-            #"areaCode": area_code,
             "eventStartDate": TODAY,
             "eventEndDate": TO_DATE,
         }
-        url = "https://apis.data.go.kr/B551011/KorService2/searchFestival2?" + urllib.parse.urlencode(params)
+
+        url = (
+            "https://apis.data.go.kr/B551011/KorService2/searchFestival2?"
+            + urllib.parse.urlencode(params)
+        )
+
         raw = http_get(url)
         j = json.loads(raw.decode("utf-8"))
 
         resp = (j or {}).get("response") or {}
         header = resp.get("header") or {}
+
         if str(header.get("resultCode")) not in ("0000", "0"):
-            raise RuntimeError(f"TourAPI {area_name} 오류: {header}")
+            raise RuntimeError(f"TourAPI 오류: {header}")
 
         body = resp.get("body") or {}
         items = (body.get("items") or {}).get("item") or []
+        total_count = int(body.get("totalCount") or 0)
+
         if isinstance(items, dict):
             items = [items]
+
+        if not items:
+            break
 
         for x in items:
             title = (x.get("title") or "").strip()
             if not title:
                 continue
+
             start = ymd(x.get("eventstartdate"))
             end = ymd(x.get("eventenddate")) or start
             addr = (x.get("addr1") or "").strip()
-            venue_raw = (x.get("addr2") or "").strip()
-            venue = venue_raw if venue_raw and venue_raw not in addr else (district_from_addr(addr) or area_name)
+
             if not ("광주" in addr or "전남" in addr or "전라남도" in addr):
-             continue
+                continue
+
+            venue_raw = (x.get("addr2") or "").strip()
+            venue = (
+                venue_raw
+                if venue_raw and venue_raw not in addr
+                else (district_from_addr(addr) or "광주·전남")
+            )
+
             content_id = str(x.get("contentid") or "")
+
             try:
                 intro = tourapi_detail_intro(content_id)
             except Exception:
@@ -291,11 +313,13 @@ def tourapi_festivals():
                 common = tourapi_detail_common(content_id)
             except Exception:
                 common = {}
+
             try:
                 images = tourapi_detail_images(content_id)
             except Exception:
                 images = []
-                out.append({
+
+            out.append({
                 "id": f"tour-{content_id}",
                 "apiId": content_id,
                 "category": "축제",
@@ -312,22 +336,47 @@ def tourapi_festivals():
                 "booking": clean_api_text(intro.get("bookingplace")),
                 "parking": clean_api_text(intro.get("parking")),
                 "spendtime": clean_api_text(intro.get("spendtimefestival")),
-                "sponsor": clean_api_text(intro.get("sponsor1") or intro.get("sponsor2")),
-                "parking": (intro.get("parking") or "").strip(),
+                "sponsor": clean_api_text(
+                    intro.get("sponsor1") or intro.get("sponsor2")
+                ),
                 "status": "예정" if start and start > TODAY_ISO else "진행중",
                 "start": start,
                 "end": end,
-                "image": x.get("firstimage") or x.get("firstimage2") or common.get("firstimage") or common.get("firstimage2") or (images[0].get("originimgurl") if images else "") or "",
+                "image": (
+                    x.get("firstimage")
+                    or x.get("firstimage2")
+                    or common.get("firstimage")
+                    or common.get("firstimage2")
+                    or (images[0].get("originimgurl") if images else "")
+                    or ""
+                ),
                 "lat": float(x["mapy"]) if x.get("mapy") else None,
                 "lng": float(x["mapx"]) if x.get("mapx") else None,
-                "contact": intro.get("sponsor1tel") or intro.get("sponsor2tel") or x.get("tel") or "",
+                "contact": (
+                    intro.get("sponsor1tel")
+                    or intro.get("sponsor2tel")
+                    or x.get("tel")
+                    or ""
+                ),
                 "description": clean_api_text(common.get("overview")),
                 "source": "한국관광공사 TourAPI",
-                "url": extract_api_url(intro.get("eventhomepage") or common.get("homepage")),
+                "url": extract_api_url(
+                    intro.get("eventhomepage") or common.get("homepage")
+                ),
                 "origin": "tourapi",
                 "verified": TODAY_ISO,
-               "tags": ["축제", "광주" if "광주광역시" in addr else "전남"],
+                "tags": [
+                    "축제",
+                    "광주" if "광주광역시" in addr else "전남",
+                ],
             })
+
+        # 현재 페이지까지 다 읽었으면 종료
+        if page_no * num_rows >= total_count:
+            break
+
+        page_no += 1
+
     return out
 
 def kopis_performances():
