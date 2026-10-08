@@ -1874,16 +1874,33 @@ const JN_D = Object.values(REGIONS).flatMap(r => r.districts).filter(d => !GJ_GU
 function districtFromAddr(a) {
   a = String(a || "");
   const g = a.match(/(광주광역시|광주시|광주|전남광주통합특별시|전남광주특별시)\s*(동구|서구|남구|북구|광산구)(?=\s|$|,|\))/); if (g) return g[2];
-  const m = a.match(new RegExp(`(?:^|[\\s(,])(${JN_D.map(d => d.slice(0, -1)).join("|")})(시|군)?(?=[\\s,)]|$)`));
-  if (m && (m[2] || /전남|전라남도|통합특별시/.test(a))) return JN_D.find(d => d.slice(0, -1) === m[1]) || "";
+
+  // 전남 시·군 이름이 장소명/행사장명에 직접 적혀 있으면 주소가 없어도 해당 권역으로 분류한다.
+  // 예: "무안 일로읍 회산백련지", "목포 평화광장", "순천만국가정원"
+  const stems = JN_D.map(d => d.slice(0, -1));
+  const m = a.match(new RegExp(`(?:^|[\\s(,·])(${stems.join("|")})(시|군)?(?=[\\s,·)]|읍|면|동|$)`));
+  if (m) return JN_D.find(d => d.slice(0, -1) === m[1]) || "";
+
+  // 자주 쓰이는 읍·면/관광지 명칭 보정
+  if (/일로읍|회산백련지|몽탄면/.test(a)) return "무안군";
   return "";
 }
 let REGION = store.get("glm_region", "gj"); if (!REGIONS[REGION]) REGION = "gj";
 const ALL = { EVENTS: [], VENUES: [], FOOD: [], BAKERIES: [], CAFES: [], CINEMAS: [], STAYS: [] };
 function regionOfItem(x) {
   let d = x.district || "";
-  if (!REGIONS.gj.districts.includes(d) && !JN_D.includes(d)) d = (x.venueId && (ALL.VENUES.find(v => v.id === x.venueId) || {}).district) || districtFromAddr(x.address || x.venue || "") || (d ? "?" : "");
-  if (!d) return "gj"; // 구·시·군 표시가 없는 옛 자료는 광주 것
+  const linked = x.venueId && (ALL.VENUES.find(v => v.id === x.venueId) || {});
+  const placeText = [x.address, x.venue, x.place, x.name, x.title, x.area, linked && linked.address, linked && linked.name].filter(Boolean).join(" ");
+
+  if (!REGIONS.gj.districts.includes(d) && !JN_D.includes(d)) {
+    d = (linked && linked.district) || districtFromAddr(placeText) || (d ? "?" : "");
+  } else {
+    // district 값과 실제 장소명이 충돌하면 실제 장소명을 우선한다.
+    const inferred = districtFromAddr(placeText);
+    if (inferred && inferred !== d) d = inferred;
+  }
+
+  if (!d) return "gj"; // 완전히 지역 단서가 없는 기존 자료만 광주권으로 유지
   return (Object.entries(REGIONS).find(([, r]) => r.districts.includes(d)) || [""])[0];
 }
 const inRegion = x => regionOfItem(x) === REGION;
@@ -4251,11 +4268,10 @@ function initDecisionMiniMap(picks){
     const pick=k=>document.querySelector(`.choiceRow[data-choice="${k}"] button.on`)?.textContent.trim()||'';
     const selected={with:pick('with').replace('🐶 ','').trim(),time:pick('time'),budget:pick('budget'),move:pick('move')};
     const reasons=decisionReasonSet(selected), reality=decisionRealityScore(selected), routePicks=decisionRoutePicks(selected);
-    const wideOk = REGION === 'gj' && selected.time === '하루' && selected.budget === '상관없음' && selected.move === '자동차';
-    // 짧은 일정·제한 예산은 현재 권역을 절대 벗어나지 않는다. 광주권 확장은 '하루+자동차+예산 상관없음'일 때만 허용한다.
-    const scope = wideOk
-      ? `현재 선택 권역은 ${RNAME()}이며 광주권을 우선 추천하되, 하루 종일 자동차 이동이고 예산 제한이 없으므로 필요할 때만 순천여수권·무안목포권까지 확대 가능.`
-      : `현재 선택 권역 ${RNAME()} 안에서만 추천. 다른 권역(순천여수권·무안목포권)으로 넘어가지 말 것.`;
+    // 권역을 선택했다면 시간·예산·자동차 조건과 관계없이 그 권역 안에서만 추천한다.
+    // 광주권에서 무안·목포·순천·여수 등이 섞이는 일을 막는다.
+    const wideOk = false;
+    const scope = `현재 선택 권역 ${RNAME()} 안에서만 추천. 다른 권역으로 넘어가지 말 것.`;
     const q=`${scope} 오늘 지금부터 ${selected.time} 동안 ${selected.with}와, 예산 ${selected.budget}, ${selected.move} 이동으로 갈 수 있는 곳. 현재 운영/진행 중인 곳만 골라서 전시·축제·공연·가볼 곳·맛집·카페 중 가까운 동선으로 3개 코스 추천`;
     const input=document.getElementById('aiq'); if(input) input.value=q;
     if(typeof recommend==='function') recommend(q);
@@ -4266,7 +4282,7 @@ function initDecisionMiniMap(picks){
     const modal=document.getElementById('modal');
     if(answer && mc && modal){
       mc.innerHTML=`<div class="decisionResult">
-        <div class="drHead"><div class="appResultHint">오늘어디로 AI가 방금 고른 코스</div><span class="eyebrow">AI TODAY PICK</span><h3>오늘은 이렇게 가보세요.</h3><p style="margin:0;color:var(--muted);font-size:14px">${wideOk ? `${esc(RNAME())}을 우선으로 보고, 조건상 먼 권역까지 갈 수 있는 경우에만 범위를 넓혀요.` : `${esc(RNAME())} 안에서만, 고른 조건과 오늘 이용 가능한 정보를 기준으로 추렸어요.`} 모바일에서는 이 화면이 앱 결과 페이지처럼 열립니다.</p></div>
+        <div class="drHead"><div class="appResultHint">오늘어디로 AI가 방금 고른 코스</div><span class="eyebrow">AI TODAY PICK</span><h3>오늘은 이렇게 가보세요.</h3><p style="margin:0;color:var(--muted);font-size:14px">${`${esc(RNAME())} 안에서만, 고른 조건과 오늘 이용 가능한 정보를 기준으로 추렸어요.`} 모바일에서는 이 화면이 앱 결과 페이지처럼 열립니다.</p></div>
         <div class="creamingGuide"><img class="creamingMascot" src="${CREAMING_SRC}" alt="크리밍"><div class="creamingBubble"><b>크리밍이 골라봤어요!</b>${esc(selected.time)} 동안 ${esc(selected.move)}로 이동하기 좋은 코스를 먼저 묶었어요. 아래에서 이동 순서도 같이 확인해보세요.</div></div>
         <div class="drChoices"><span>📍 ${esc(RNAME())}${wideOk ? ' 우선' : ''}</span><span>👥 ${esc(selected.with)}</span><span>⏱ ${esc(selected.time)}</span><span>💰 ${esc(selected.budget)}</span><span>🚙 ${esc(selected.move)}</span></div>
         <div class="realityScore"><strong>${reality}%</strong><div><b>오늘 가기 현실성</b><small>운영 정보 · 날씨 · 선택 조건 확인 정도를 바탕으로 표시해요.</small></div></div>
