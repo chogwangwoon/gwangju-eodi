@@ -1171,7 +1171,28 @@ button{min-height:var(--tap)}
   .heroCopy h1{font-size:31px;line-height:1.13;margin:7px 0 9px;max-width:300px}
   .heroCopy p{font-size:13.5px;line-height:1.55;max-width:330px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .heroFresh{font-size:11px;margin-top:9px;padding:5px 8px}
-  .photoCard{display:none}
+  .photoCard{
+    display:block;
+    width:100%;
+    aspect-ratio:16/10;
+    margin-top:14px;
+    border-radius:20px;
+    transform:none;
+    box-shadow:0 14px 32px rgba(80,70,55,.14),0 0 0 5px rgba(255,255,255,.72);
+  }
+  .photoCard .wx{
+    left:10px;
+    top:10px;
+    max-width:82%;
+    font-size:12.5px;
+    padding:7px 10px;
+    border-radius:12px;
+  }
+  .photoCard .wx small{font-size:11px}
+  .photoCard .slideCap{left:12px;right:12px;bottom:10px;font-size:13px}
+  .photoCard .dots{gap:5px}
+  .photoCard .dots i{width:6px;height:6px}
+  .photoCard .dots i.on{width:16px}
   .heroStats{grid-template-columns:repeat(4,1fr);margin-top:13px;gap:6px}
   .heroStats .heroNow{grid-column:1/-1;min-height:44px}
   .heroStats button{border-radius:14px;padding:7px 3px;min-height:52px;box-shadow:0 3px 10px rgba(60,55,45,.07)}
