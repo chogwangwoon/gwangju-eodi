@@ -77,6 +77,8 @@ img{max-width:100%}
 .slides figure.on{opacity:1}
 .slides img{width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:transform 8s ease-out}
 .slides figure.on img{transform:scale(1)}
+.heroPhotoFallback{position:absolute;inset:0;display:none;background:linear-gradient(135deg,#f6d7b9,#cfe3d8)}
+.heroPhotoFallback.show{display:block}
 .photoCard:after{content:"";position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(transparent,rgba(0,0,0,.45));pointer-events:none}
 .wx{position:absolute;z-index:3;left:14px;top:14px;font-size:14px;font-weight:700;background:rgba(255,255,255,.92);color:var(--ink);border-radius:14px;padding:8px 12px;box-shadow:0 4px 12px rgba(0,0,0,.12);max-width:75%}
 .wx small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
@@ -1577,7 +1579,7 @@ button{min-height:var(--tap)}
 </main>
 
 <footer class="foot2"><svg viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 L1440 0 L1440 20 C1380 26 1320 14 1240 22 C1160 30 1120 46 1040 44 C960 42 930 24 850 26 C770 28 720 52 640 54 C560 56 520 36 440 34 C360 32 300 46 220 42 C140 38 70 22 0 26 Z" fill="#f6f1e7"/></svg>
-<div class="wrap"><b>오늘, 전남광주 어디로?</b><p>무등산에서 남해 바다까지, 전남광주 — 오늘도 징하게 재밌는 하루 되쇼잉.</p><p style="font-size:12.5px;opacity:.75">개인이 만든 비공식 안내 앱이에요. 전남광주특별시(시청)의 공식 서비스가 아니에요.</p><p style="font-size:12.5px;opacity:.75">사진: 한국관광공사 · 지도: © OpenStreetMap, CARTO · 날씨: Open-Meteo</p><p style="font-size:12.5px;opacity:.75">일정 출처: 한국문화정보원 · 한국관광공사 · 공연예술통합전산망(KOPIS) · 각 기관 누리집</p><p style="font-size:12px;opacity:.7">© 2026 오늘, 전남광주 어디로?. 앱 화면·코드·편집 데이터의 무단 복제·수정·재배포와 상업적 이용을 금지합니다. 업체 홍보·광고는 게재하지 않으며, 일정은 공공기관·공식 누리집 정보만 모아요.</p>
+<div class="wrap"><b>오늘, 전남광주 어디로?</b><p>무등산에서 남해 바다까지, 전남광주 — 오늘도 징하게 재밌는 하루 되쇼잉.</p><p style="font-size:12.5px;opacity:.75">개인이 만든 비공식 안내 앱이에요. 전남광주특별시(시청)의 공식 서비스가 아니에요.</p><p style="font-size:12.5px;opacity:.75">사진: 한국관광공사 · 지도: © OpenStreetMap, CARTO · 날씨: Open-Meteo (연결 지연 시 보조 날씨 사용)</p><p style="font-size:12.5px;opacity:.75">일정 출처: 한국문화정보원 · 한국관광공사 · 공연예술통합전산망(KOPIS) · 각 기관 누리집</p><p style="font-size:12px;opacity:.7">© 2026 오늘, 전남광주 어디로?. 앱 화면·코드·편집 데이터의 무단 복제·수정·재배포와 상업적 이용을 금지합니다. 업체 홍보·광고는 게재하지 않으며, 일정은 공공기관·공식 누리집 정보만 모아요.</p>
 <p style="font-size:12px;opacity:.7">크리밍 캐릭터 디자인은 저작권 등록되어 있으며, 무단 이용·복제·수정·재배포를 금지합니다.</p>
 <p style="font-size:12px;opacity:.7">크리밍 캐릭터 디자인은 저작권 등록되어 있으며, 무단 이용·복제·수정·재배포를 금지합니다.</p></div></footer>
 
@@ -2008,7 +2010,10 @@ function renderHeroPics() {
   });
   VENUES.forEach(v => { if (v.image && !seen.has(v.image) && !seen.has(v.id)) { seen.add(v.image); pool.push({ u: v.image, c: v.name.split(" (")[0].split(" · ")[0], t: "v", id: v.id, io: ioOf(v), seasons: v.season }) } });
   const pics = pool.map(p => [heroScore(p, x), p]).sort((a, b) => b[0] - a[0]).slice(0, 9).map(a => a[1]);
-  el.innerHTML = pics.map((p, i) => `<figure class="${i === 0 ? "on" : ""}" data-cap="${esc(p.c)}" onclick="openPic('${p.t}','${esc(p.id)}')" role="img" aria-label="${esc(p.c)}"><div class="ph"${bg(p.u)}></div></figure>`).join("");
+  el.innerHTML = pics.map((p, i) => {
+    const raw = rawImg(p.u), px = proxyImg(p.u);
+    return `<figure class="${i === 0 ? "on" : ""}" data-cap="${esc(p.c)}" onclick="openPic('${p.t}','${esc(p.id)}')" role="img" aria-label="${esc(p.c)}"><img src="${esc(px || raw)}" data-raw="${esc(raw)}" data-step="0" alt="${esc(p.c)}" ${i === 0 ? 'loading="eager"' : 'loading="lazy"'} referrerpolicy="no-referrer" onerror="heroImgFail(this)"><div class="ph heroPhotoFallback"></div></figure>`;
+  }).join("");
   const dots = $("#dots"); dots.innerHTML = pics.map((_, i) => `<i class="${i === 0 ? "on" : ""}" onclick="goSlide(${i})"></i>`).join("");
   heroFx(x);
   if (!pics.length) { $("#slideName").textContent = `📍 ${RNAME()} 사진은 자동 수집으로 채워지는 중이에요`; clearInterval(SLIDE_TIMER); return }
@@ -2082,6 +2087,44 @@ async function fetchJsonWithRetry(url, { attempts = 2, timeout = 8000 } = {}) {
     }
   }
   throw lastErr || new Error("fetch failed");
+}
+
+function wttrWmo(text){
+  const s = String(text || "").toLowerCase();
+  if (/thunder/.test(s)) return 95;
+  if (/snow|sleet|blizzard|ice/.test(s)) return 71;
+  if (/rain|drizzle|shower/.test(s)) return 61;
+  if (/fog|mist|haze/.test(s)) return 45;
+  if (/overcast|cloudy/.test(s)) return 3;
+  if (/partly/.test(s)) return 2;
+  return 0;
+}
+async function fetchWttrFallback(lat, lon){
+  const url = `https://wttr.in/${lat},${lon}?format=j1`;
+  const j = await fetchJsonWithRetry(url, { attempts: 2, timeout: 9000 });
+  const cur = j.current_condition?.[0];
+  const day = j.weather?.[0];
+  if (!cur || !day) throw new Error("wttr payload");
+  const desc = cur.weatherDesc?.[0]?.value || "";
+  const hourly = Array.isArray(day.hourly) ? day.hourly : [];
+  const pp = hourly.reduce((m, h) => Math.max(m, Number(h.chanceofrain || 0)), 0);
+  return {
+    now: Math.round(Number(cur.temp_C)),
+    cur: wttrWmo(desc),
+    code: wttrWmo(desc),
+    max: Math.round(Number(day.maxtempC ?? cur.temp_C)),
+    min: Math.round(Number(day.mintempC ?? cur.temp_C)),
+    pp,
+    feel: Math.round(Number(cur.FeelsLikeC ?? cur.temp_C)),
+    fmax: Math.round(Number(day.maxtempC ?? cur.temp_C)),
+    uv: Number(cur.uvIndex ?? day.uvIndex) || undefined,
+    wind: cur.windspeedKmph != null ? Math.round(Number(cur.windspeedKmph) / 3.6 * 10) / 10 : undefined,
+    fetchedAt: Date.now(),
+    cached: false,
+    stale: false,
+    offline: false,
+    source: "wttr.in 보조 날씨"
+  };
 }
 
 async function loadWeather(force = false) {
@@ -2207,11 +2250,25 @@ async function loadWeather(force = false) {
     try { localStorage.setItem(cacheKey, JSON.stringify(WEATHER)); } catch {}
 
   } catch (err) {
-    // 최신값 실패 시 마지막 정상값을 유지하고 상태만 명확히 표시.
+    // Open-Meteo가 모두 실패하면 키가 필요 없는 보조 날씨 소스를 한 번 더 시도.
+    let recovered = false;
+    if (!WEATHER) {
+      try {
+        WEATHER = await fetchWttrFallback(lat, lon);
+        recovered = true;
+        WEATHER_AUTO_RETRIES = 0;
+        if (WEATHER_RETRY_TIMER) { clearTimeout(WEATHER_RETRY_TIMER); WEATHER_RETRY_TIMER = null; }
+        try { localStorage.setItem(cacheKey, JSON.stringify(WEATHER)); } catch {}
+      } catch {}
+    }
+
+    // 보조 소스도 실패한 경우에만 마지막 정상값/재시도 화면을 사용.
     if (WEATHER) {
-      WEATHER.cached = true;
-      WEATHER.stale = true;
-      WEATHER.offline = false;
+      if (!recovered) {
+        WEATHER.cached = true;
+        WEATHER.stale = true;
+        WEATHER.offline = false;
+      }
     } else {
       if (wxEl) {
         wxEl.innerHTML = `⚠️ 날씨 연결이 늦어요<small>눌러서 다시 불러오기</small>`;
@@ -2307,6 +2364,7 @@ function renderWxTips() {
 
 setInterval(()=>{ if(document.visibilityState !== "hidden") loadWeather(false); }, 30 * 60e3);
 window.addEventListener("online", ()=>loadWeather(true));
+setTimeout(() => { if (!WEATHER && navigator.onLine) loadWeather(true); }, 6000);
 document.addEventListener("visibilitychange", ()=>{
   if(document.visibilityState === "visible" && (!WEATHER || !WEATHER.fetchedAt || Date.now()-WEATHER.fetchedAt > 30*60*1000)) {
     loadWeather(false);
@@ -2334,6 +2392,35 @@ const proxyImg = u => {
   return `https://wsrv.nl/?url=${encodeURIComponent(bare)}&w=1600&output=jpg`;
 };
 const rawImg = u => ensureHttps(u);
+
+/* 히어로 사진: 외부 프록시/원본이 모두 막혀도 앱 내부 대표사진으로 자동 대체 */
+function heroStableFallback(){
+  const preferred = ["acc","nmg","gma","artcenter","champions"];
+  for (const id of preferred) {
+    const v = VENUES.find(x => x.id === id && String(x.image || "").startsWith("data:image/"));
+    if (v?.image) return v.image;
+  }
+  const any = VENUES.find(x => String(x.image || "").startsWith("data:image/"));
+  return any?.image || "";
+}
+window.heroImgFail = img => {
+  const step = Number(img.dataset.step || 0);
+  const raw = img.dataset.raw || "";
+  if (step === 0 && raw && img.src !== raw) {
+    img.dataset.step = "1";
+    img.src = raw;
+    return;
+  }
+  const stable = heroStableFallback();
+  if (step <= 1 && stable) {
+    img.dataset.step = "2";
+    img.src = stable;
+    return;
+  }
+  img.dataset.step = "3";
+  img.style.display = "none";
+  img.nextElementSibling?.classList.add("show");
+};
 function imgWithFallback(u, alt="", cls=""){
   if (!u) return `<div class="ph emptyPhoto"><span>📷</span><small>사진 확인 중</small></div>`;
   const raw = rawImg(u), px = proxyImg(u);
