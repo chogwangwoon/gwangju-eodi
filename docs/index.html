@@ -1794,7 +1794,7 @@ function sportsScheduleLine(x){
 
 /* ▼ 앱을 인터넷에 올린 주소 (GitHub Pages). 넣어 두면 PC용 파일도 열 때마다 최신 일정을 받아와요.
    예: const DATA_URL = "https://아이디.github.io/gwangju-eodi";   비워 두면 파일 안에 든 데이터만 써요. */
-const DATA_URL = "";
+const DATA_URL = "https://chogwangwoon.github.io/gwangju-eodi";
 async function getJSON(n, fallback = []) {
   const local = location.protocol === "file:" || window.__PC__;
   const base = local ? (DATA_URL ? DATA_URL.replace(/\/+$/, "") + "/" : "") : "";
