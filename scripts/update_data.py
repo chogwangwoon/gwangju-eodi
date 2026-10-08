@@ -258,17 +258,28 @@ def smart_event_key(e):
 
     return f"{title}:{start}:{end}"
 def merge_events(manual, api_events):
-       merged, seen = [], set()
+    merged, seen = [], set()
+
     # 수동 데이터가 앞에 있으므로 같은 항목이면 수동 데이터가 우선.
     for e in manual + api_events:
         if e.get("end") and e["end"] < TODAY_ISO:
             continue
-       k = smart_event_key(e)
+
+        k = smart_event_key(e)
+
         if k in seen:
             continue
+
         seen.add(k)
         merged.append(e)
-    merged.sort(key=lambda e: (e.get("start") or "9999-99-99", e.get("title") or ""))
+
+    merged.sort(
+        key=lambda e: (
+            e.get("start") or "9999-99-99",
+            e.get("title") or ""
+        )
+    )
+
     return merged
 
 def main():
