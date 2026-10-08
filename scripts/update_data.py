@@ -211,6 +211,33 @@ def tourapi_detail_common(content_id, content_type_id="15"):
         return items
 
     return {} 
+def tourapi_detail_images(content_id):
+    params = {
+        "serviceKey": DATA_KEY,
+        "MobileOS": "ETC",
+        "MobileApp": "gwangju-eodi",
+        "_type": "json",
+        "contentId": content_id,
+        "imageYN": "Y",
+        "subImageYN": "Y",
+    }
+
+    url = (
+        "https://apis.data.go.kr/B551011/KorService2/detailImage2?"
+        + urllib.parse.urlencode(params)
+    )
+
+    raw = http_get(url)
+    j = json.loads(raw.decode("utf-8"))
+
+    resp = (j or {}).get("response") or {}
+    body = resp.get("body") or {}
+    items = (body.get("items") or {}).get("item") or []
+
+    if isinstance(items, dict):
+        items = [items]
+
+    return items if isinstance(items, list) else []
 def tourapi_festivals():
     if not DATA_KEY:
         raise RuntimeError("DATA_GO_KR_KEY가 없습니다.")
@@ -264,7 +291,11 @@ def tourapi_festivals():
                 common = tourapi_detail_common(content_id)
             except Exception:
                 common = {}
-            out.append({
+            try:
+                images = tourapi_detail_images(content_id)
+            except Exception:
+                images = []
+                out.append({
                 "id": f"tour-{content_id}",
                 "apiId": content_id,
                 "category": "축제",
@@ -286,7 +317,7 @@ def tourapi_festivals():
                 "status": "예정" if start and start > TODAY_ISO else "진행중",
                 "start": start,
                 "end": end,
-                "image": x.get("firstimage") or x.get("firstimage2") or common.get("firstimage") or common.get("firstimage2") or "",
+                "image": x.get("firstimage") or x.get("firstimage2") or common.get("firstimage") or common.get("firstimage2") or (images[0].get("originimgurl") if images else "") or "",
                 "lat": float(x["mapy"]) if x.get("mapy") else None,
                 "lng": float(x["mapx"]) if x.get("mapx") else None,
                 "contact": intro.get("sponsor1tel") or intro.get("sponsor2tel") or x.get("tel") or "",
