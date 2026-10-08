@@ -151,7 +151,7 @@ def tourapi_detail_intro(content_id, content_type_id="15"):
         return items
 
     return {}
- def tourapi_detail_common(content_id, content_type_id="15"):
+def tourapi_detail_common(content_id, content_type_id="15"):
     params = {
         "serviceKey": DATA_KEY,
         "MobileOS": "ETC",
