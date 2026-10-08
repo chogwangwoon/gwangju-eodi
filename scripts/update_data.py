@@ -121,7 +121,7 @@ def dedup_key(e):
     if api_id:
         return f"{e.get('origin','api')}:{api_id}"
     return f"{norm_title(e.get('title',''))}:{e.get('start','')}"
-    def clean_api_text(value):
+def clean_api_text(value):
     if not value:
         return ""
 
@@ -145,8 +145,8 @@ def extract_api_url(value):
         return match.group(1).strip()
 
     return text
-def tourapi_detail_intro(content_id, content_type_id="15"):
 
+def tourapi_detail_intro(content_id, content_type_id="15"):
     params = {
         "serviceKey": DATA_KEY,
         "MobileOS": "ETC",
