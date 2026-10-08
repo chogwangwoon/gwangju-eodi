@@ -121,7 +121,35 @@ def dedup_key(e):
     if api_id:
         return f"{e.get('origin','api')}:{api_id}"
     return f"{norm_title(e.get('title',''))}:{e.get('start','')}"
+def tourapi_detail_intro(content_id, content_type_id="15"):
+    params = {
+        "serviceKey": DATA_KEY,
+        "MobileOS": "ETC",
+        "MobileApp": "gwangju-eodi",
+        "_type": "json",
+        "contentId": content_id,
+        "contentTypeId": content_type_id,
+    }
 
+    url = (
+        "https://apis.data.go.kr/B551011/KorService2/detailIntro2?"
+        + urllib.parse.urlencode(params)
+    )
+
+    raw = http_get(url)
+    j = json.loads(raw.decode("utf-8"))
+
+    resp = (j or {}).get("response") or {}
+    body = resp.get("body") or {}
+    items = (body.get("items") or {}).get("item") or []
+
+    if isinstance(items, list):
+        return items[0] if items else {}
+
+    if isinstance(items, dict):
+        return items
+
+    return {}
 def tourapi_festivals():
     if not DATA_KEY:
         raise RuntimeError("DATA_GO_KR_KEY가 없습니다.")
@@ -161,21 +189,24 @@ def tourapi_festivals():
             start = ymd(x.get("eventstartdate"))
             end = ymd(x.get("eventenddate")) or start
             addr = (x.get("addr1") or "").strip()
+            venue_raw = (x.get("addr2") or "").strip()
+            venue = venue_raw if venue_raw and venue_raw not in addr else (district_from_addr(addr) or area_name)
             if not ("광주" in addr or "전남" in addr or "전라남도" in addr):
              continue
             content_id = str(x.get("contentid") or "")
+            intro = tourapi_detail_intro(content_id) 
             out.append({
                 "id": f"tour-{content_id}",
                 "apiId": content_id,
                 "category": "축제",
                 "subtype": "관광공사 행사",
                 "title": title,
-                "venue": (x.get("addr2") or addr or area_name).strip(),
+                "venue": venue,
                 "district": district_from_addr(addr),
                 "address": addr,
                 "date": f"{start or ''} ~ {end or ''}".strip(" ~"),
-                "time": "공식 상세 확인",
-                "price": "공식 상세 확인",
+                "time": (intro.get("playtime") or "공식 상세 확인").strip(),
+                "price": (intro.get("usetimefestival") or "공식 상세 확인").strip(),
                 "status": "예정" if start and start > TODAY_ISO else "진행중",
                 "start": start,
                 "end": end,
@@ -184,7 +215,7 @@ def tourapi_festivals():
                 "lng": float(x["mapx"]) if x.get("mapx") else None,
                 "contact": x.get("tel") or "",
                 "source": "한국관광공사 TourAPI",
-                "url": "",
+                "url": (intro.get("eventhomepage") or "").strip(),
                 "origin": "tourapi",
                 "verified": TODAY_ISO,
                "tags": ["축제", "광주" if "광주광역시" in addr else "전남"],
