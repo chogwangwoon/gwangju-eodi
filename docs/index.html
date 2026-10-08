@@ -4019,21 +4019,57 @@ document.querySelectorAll(".quick button").forEach(b => b.onclick = () => { cons
 /* ───────── 상세 모달 ───────── */
 function detailView(id) {
   const x = EVENTS.find(e => e.id === id) || ALL.EVENTS.find(e => e.id === id); if (!x) return;
-  const apiOrigin = ["auto", "tourapi", "kopis"].includes(x.origin);
-  const originLabel = x.origin === "tourapi" ? "TourAPI 자동수집" : x.origin === "kopis" ? "KOPIS 자동수집" : x.origin === "auto" ? "자동수집" : "직접확인";
+
+  const isAuto = ["auto", "tourapi", "kopis"].includes(x.origin) || /TourAPI|KOPIS/i.test(x.source || "");
+  const samePlace = x.address && x.venue && String(x.address).trim() === String(x.venue).trim();
+  const placeLine = samePlace ? esc(x.address) : `${esc(x.venue || "")}${x.address ? " · " + esc(x.address) : ""}`;
+
   const rows = [
-    ["일정", x.date], ["장소", x.venue], ["시간", x.time], ["가격", x.price],
-    ["관람연령", x.age], ["프로그램", x.program], ["예매정보", x.booking], ["소요시간", x.spendtime], ["주최기관", x.sponsor],
-    ["할인", x.discount], ["단체", x.group], ["유아", x.child], ["반려동물", x.pet], ["유모차", x.stroller],
-    ["수유실", x.nursing], ["접근성", x.accessibility], ["예약", x.reservation], ["문의", x.contact], ["확인상태", x.verify]
+    ["일정", x.date],
+    ["장소", x.venue],
+    ["시간", x.time],
+    ["가격", x.price],
+    ["관람연령", x.age],
+    ["프로그램", x.program],
+    ["예매정보", x.booking],
+    ["주차", x.parking],
+    ["소요시간", x.spendtime],
+    ["주최기관", x.sponsor],
+    ["할인", x.discount],
+    ["단체", x.group],
+    ["유아", x.child],
+    ["반려동물", x.pet],
+    ["유모차", x.stroller],
+    ["수유실", x.nursing],
+    ["접근성", x.accessibility],
+    ["예약", x.reservation],
+    ["문의", x.contact],
+    ["확인상태", x.verify]
   ].filter(r => r[1]);
-  const venueText = String(x.venue || "").trim(), addressText = String(x.address || "").trim();
-  const locationText = venueText && addressText && venueText !== addressText && !addressText.includes(venueText) && !venueText.includes(addressText)
-    ? `${venueText} · ${addressText}` : (venueText || addressText);
-  const ticketHtml = x.category === "축제" && !x.ticket && !x.booking ? "" : ticketBadge(x, true);
-  const descHtml = x.description ? `<div class="detail"><span>상세설명</span><div>${esc(x.description)}</div></div>` : "";
-  const urlBtn = x.url ? `<a class="btn" target="_blank" rel="noopener" href="${safeUrl(x.url)}">공식 원문 ↗</a> ` : "";
-  $("#modalContent").innerHTML = `<span class="eyebrow">${esc(x.category)} · ${esc(x.subtype)} · ${esc(originLabel)}</span><h3>${esc(x.title)}</h3>${locationText ? `<p style="font-size:11px;color:#6d766f">${esc(locationText)}</p>` : ""}${ticketHtml}${trustStrip(x)}${(x.ticket?.links || []).length > 1 ? `<p class="links">${x.ticket.links.map(l => `<a class="btn" target="_blank" rel="noopener" href="${safeUrl(l.url)}">${esc(l.name)} ↗</a>`).join(" ")}</p>` : ""}${parkLine(x, true)}${rows.map(r => `<div class="detail"><span>${r[0]}</span><div>${esc(r[1])}</div></div>`).join("")}${descHtml}${apiOrigin ? `<p class="verify">공공데이터에서 자동으로 받아온 정보예요. 비어 있는 항목이나 변경 가능성이 있는 내용은 공식 원문에서 최종 확인해 주세요.</p>` : ""}<p>${urlBtn}<a class="btn" target="_blank" rel="noopener" href="${mapLink(x.venue || x.address || x.title)}">지도 ↗</a></p>`;
+
+  const ticketHtml = (x.category === "축제" && !(x.ticket?.status || x.booking)) ? "" : ticketBadge(x, true);
+  const descHtml = x.description
+    ? `<div class="detail"><span>상세설명</span><div style="line-height:1.75;white-space:normal">${esc(x.description)}</div></div>`
+    : "";
+  const sourceHtml = isAuto
+    ? `<p class="verify">공공데이터에서 자동으로 받아온 일정이에요. 세부 운영정보는 공식 원문에서 한 번 더 확인해 주세요.</p>`
+    : "";
+  const originLabel = isAuto ? "자동수집" : "직접확인";
+  const urlBtn = x.url
+    ? `<a class="btn" target="_blank" rel="noopener" href="${safeUrl(x.url)}">공식 원문 ↗</a> `
+    : "";
+
+  $("#modalContent").innerHTML =
+    `<span class="eyebrow">${esc(x.category)} · ${esc(x.subtype)} · ${originLabel}</span>` +
+    `<h3>${esc(x.title)}</h3>` +
+    `<p style="font-size:11px;color:#6d766f">${placeLine}</p>` +
+    `${ticketHtml}${trustStrip(x)}` +
+    `${(x.ticket?.links || []).length > 1 ? `<p class="links">${x.ticket.links.map(l => `<a class="btn" target="_blank" rel="noopener" href="${safeUrl(l.url)}">${esc(l.name)} ↗</a>`).join(" ")}</p>` : ""}` +
+    `${parkLine(x, true)}` +
+    `${rows.map(r => `<div class="detail"><span>${r[0]}</span><div>${esc(r[1])}</div></div>`).join("")}` +
+    `${descHtml}${sourceHtml}` +
+    `<p>${urlBtn}<a class="btn" target="_blank" rel="noopener" href="${mapLink(x.venue || x.address || x.title)}">지도 ↗</a></p>`;
+
   $("#modal").classList.remove("decisionMode");
   $("#modal").classList.add("show");
   document.body.classList.add("modal-open");
