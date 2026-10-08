@@ -1130,6 +1130,15 @@ small,.gu,.kind,.tag{letter-spacing:0}
 .weatherReco button{background:#fff;border:1px solid #bfd9d0;border-radius:999px;padding:6px 10px;color:#14554a;font-size:12px;font-weight:750}
 .weatherReco .weatherReason{font-size:12px;color:#425f53;margin-right:4px}
 @media(max-width:600px){.artistFollow{padding:12px}.artistForm input{flex-basis:100%}.weatherReco button{font-size:11.5px}}
+
+/* 휴대폰 홈에서 메뉴를 밀지 않아도 바로 보이는 공연 바로가기 */
+.concertQuickAccess{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.concertQuickAccess button{min-width:0;border-radius:14px;padding:13px 12px;text-align:left;font-size:14px;font-weight:850;line-height:1.35;box-shadow:0 4px 12px rgba(20,40,30,.08)}
+.concertQuickAccess button span{display:block;font-size:11.5px;font-weight:650;margin-top:4px;opacity:.9}
+.concertQuickPrimary{border:1px solid #275e57;background:#145b55;color:#fff}
+.concertQuickFollow{border:1px solid #ebd7ad;background:#fff9e9;color:#765018}
+.concertQuickAccess button:focus-visible{outline:3px solid #f5a524;outline-offset:3px}
+@media(max-width:759px){.concertQuickAccess{gap:8px;margin-top:10px}.concertQuickAccess button{padding:12px 10px;font-size:13px}.concertQuickAccess button span{font-size:11px}}
 </style><title>PC · 오늘, 전남광주 어디로?</title>
 <style>
 .bakery .foodIcon{font-size:34px;display:flex;align-items:center;justify-content:center;min-width:72px;background:linear-gradient(145deg,#fff3d9,#f5dfb7);border-radius:16px}
@@ -1545,6 +1554,10 @@ button{min-height:var(--tap)}
         <button onclick="showTab('places')"><strong id="placeNum">—</strong><span>가볼 곳</span></button>
         <button onclick="showTab('food')"><strong id="foodNum">—</strong><span>맛집</span></button>
         <button onclick="showTab('cafes')"><strong id="cafeNum">—</strong><span>멍카페</span></button>
+      </div>
+      <div class="concertQuickAccess" aria-label="대중가수 공연 빠른 이용">
+        <button type="button" class="concertQuickPrimary" onclick="showTab('popshows')">🎤 대중가수 공연 <span>공연·예매 보기 ›</span></button>
+        <button type="button" class="concertQuickFollow" onclick="openArtistFollowQuick()">⭐ 관심 가수 등록 <span>알림 설정 ›</span></button>
       </div>
       <button type="button" class="manualLaunch" onclick="openUserManual()" aria-haspopup="dialog">📖 앱 사용설명서 <span>앱 소개 · 기능 · 이용방법 ›</span></button>
     </div>
@@ -4798,6 +4811,21 @@ initNav();
 function openUserManual(){const el=document.getElementById('userManual');el.hidden=false;document.body.dataset.manualOpen='1';el.querySelector('.manualPanel').focus();}
 function closeUserManual(){document.getElementById('userManual').hidden=true;delete document.body.dataset.manualOpen;}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('userManual').hidden)closeUserManual()});
+</script>
+<script>
+window.openArtistFollowQuick=function(){
+  showTab('popshows');
+  const jump=()=>{
+    const block=document.querySelector('#popshowsView .artistFollow');
+    if(!block)return;
+    const sticky=document.querySelector('header.top')?.offsetHeight||62;
+    const y=block.getBoundingClientRect().top+window.scrollY-sticky-16;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+    const input=block.querySelector('input');
+    if(input){input.focus({preventScroll:true});}
+  };
+  requestAnimationFrame(()=>requestAnimationFrame(jump));
+};
 </script>
 </body></html>
 </script><script>(function(){const f=()=>document.documentElement.style.setProperty("--hh",document.querySelector("header.top").offsetHeight+"px");f();addEventListener("resize",f)})()</script></body></html>
