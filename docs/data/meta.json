@@ -1,23 +1,119 @@
 {
-  "updated_at": "2026-10-09T11:02:07+09:00",
+  "updated_at": "2026-10-09T11:08:40+09:00",
   "auto_update": true,
-  "manual_count": 76,
-  "events_count": 88,
-  "api_status": [
+  "sources": [
     {
       "id": "tourapi",
-      "name": "한국관광공사 행사",
+      "name": "관광공사 행사·축제",
       "ok": true,
-      "count": 64,
+      "count": 30,
       "message": "정상 수집"
     },
     {
       "id": "kopis",
       "name": "KOPIS 공연",
       "ok": true,
-      "count": 3,
+      "count": 102,
       "message": "정상 수집"
+    },
+    {
+      "id": "culture",
+      "name": "문화정보원 전시·체험",
+      "ok": false,
+      "count": 0,
+      "message": "수집 실패 · 지난 자료 0건 유지 (문화정보원 period 호출 실패 (period2/period): HTTP Error 400: Bad Request)"
     }
   ],
-  "note": "수동 데이터 우선 병합 · API 실패 시 기존 배포 데이터 유지"
+  "api_status": [
+    {
+      "id": "tourapi",
+      "name": "관광공사 행사·축제",
+      "ok": true,
+      "count": 30,
+      "message": "정상 수집"
+    },
+    {
+      "id": "kopis",
+      "name": "KOPIS 공연",
+      "ok": true,
+      "count": 102,
+      "message": "정상 수집"
+    },
+    {
+      "id": "culture",
+      "name": "문화정보원 전시·체험",
+      "ok": false,
+      "count": 0,
+      "message": "수집 실패 · 지난 자료 0건 유지 (문화정보원 period 호출 실패 (period2/period): HTTP Error 400: Bad Request)"
+    }
+  ],
+  "counts": {
+    "total": 180,
+    "auto": 108,
+    "manual": 72
+  },
+  "manual_count": 76,
+  "events_count": 180,
+  "note": "직접 확인한 일정 우선 병합 · 출처별 실패 시 지난 자료 유지",
+  "local": {
+    "programs": {
+      "name": "평생학습 강좌",
+      "ok": false,
+      "count": 0,
+      "fetched_at": null,
+      "message": "수집 실패 · 지난 자료 유지 (HTTP Error 400: Bad Request)"
+    },
+    "libraries": {
+      "name": "도서관",
+      "ok": false,
+      "count": 0,
+      "fetched_at": null,
+      "message": "수집 실패 · 지난 자료 유지 (HTTP Error 403: Forbidden)"
+    },
+    "holidays": {
+      "name": "공휴일",
+      "ok": false,
+      "count": 0,
+      "fetched_at": null,
+      "message": "수집 실패 · 지난 자료 유지 (HTTP Error 403: Forbidden)"
+    }
+  },
+  "place_fill": {
+    "checked_at": "2026-10-09T11:11:44+09:00",
+    "tourapi_calls": 448,
+    "osm_lookups": 372,
+    "unfinished": false,
+    "lists": {
+      "venues": {
+        "total": 332,
+        "with_coords": 268,
+        "coords_filled": 175,
+        "hours_filled": 0
+      },
+      "restaurants": {
+        "total": 75,
+        "with_coords": 33,
+        "coords_filled": 33,
+        "hours_filled": 16
+      },
+      "bakeries": {
+        "total": 15,
+        "with_coords": 10,
+        "coords_filled": 10,
+        "hours_filled": 0
+      },
+      "cafes": {
+        "total": 28,
+        "with_coords": 9,
+        "coords_filled": 9,
+        "hours_filled": 0
+      },
+      "cinemas": {
+        "total": 7,
+        "with_coords": 7,
+        "coords_filled": 7,
+        "hours_filled": 0
+      }
+    }
+  }
 }
