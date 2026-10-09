@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-09T18:24:47+09:00",
+  "updated_at": "2026-10-10T07:14:28+09:00",
   "auto_update": true,
   "sources": [
     {
@@ -13,15 +13,15 @@
       "id": "kopis",
       "name": "KOPIS 공연",
       "ok": true,
-      "count": 102,
+      "count": 100,
       "message": "정상 수집"
     },
     {
       "id": "culture",
       "name": "문화정보원 전시·체험",
-      "ok": false,
-      "count": 0,
-      "message": "수집 실패 · 지난 자료 0건 유지 (문화정보원 period 호출 실패 → period2/PageNo: HTTP 403 Forbidden · SERVICE_KEY_IS_NOT_REGISTERED_ERROR 등록되지 않은 서비스키 30 | period2/PageNo-tp: HTTP 403 Forbidden · SERVICE_KEY_IS_NOT_REGISTERED_ERROR 등록되지 않은 서비스키)"
+      "ok": true,
+      "count": 49,
+      "message": "정상 수집"
     }
   ],
   "api_status": [
@@ -36,31 +36,31 @@
       "id": "kopis",
       "name": "KOPIS 공연",
       "ok": true,
-      "count": 102,
+      "count": 100,
       "message": "정상 수집"
     },
     {
       "id": "culture",
       "name": "문화정보원 전시·체험",
-      "ok": false,
-      "count": 0,
-      "message": "수집 실패 · 지난 자료 0건 유지 (문화정보원 period 호출 실패 → period2/PageNo: HTTP 403 Forbidden · SERVICE_KEY_IS_NOT_REGISTERED_ERROR 등록되지 않은 서비스키 30 | period2/PageNo-tp: HTTP 403 Forbidden · SERVICE_KEY_IS_NOT_REGISTERED_ERROR 등록되지 않은 서비스키)"
+      "ok": true,
+      "count": 49,
+      "message": "정상 수집"
     }
   ],
   "counts": {
-    "total": 179,
-    "auto": 107,
-    "manual": 72
+    "total": 211,
+    "auto": 140,
+    "manual": 71
   },
-  "manual_count": 76,
-  "events_count": 179,
+  "manual_count": 75,
+  "events_count": 211,
   "note": "직접 확인한 일정 우선 병합 · 출처별 실패 시 지난 자료 유지",
   "local": {
     "programs": {
       "name": "평생학습 강좌",
       "ok": true,
       "count": 322,
-      "fetched_at": "2026-10-09T18:26:26+09:00",
+      "fetched_at": "2026-10-10T07:17:05+09:00",
       "fields": [
         "edcColseTime",
         "edcEndDay",
@@ -94,8 +94,8 @@
     "libraries": {
       "name": "도서관",
       "ok": true,
-      "count": 484,
-      "fetched_at": "2026-10-09T18:26:26+09:00",
+      "count": 470,
+      "fetched_at": "2026-10-10T07:17:05+09:00",
       "fields": [
         "bookCo",
         "closeDay",
@@ -129,14 +129,14 @@
     },
     "holidays": {
       "name": "공휴일",
-      "ok": false,
-      "count": 0,
-      "fetched_at": null,
-      "message": "수집 실패 · 지난 자료 유지 (HTTP 403 Forbidden · { \"OpenAPI_ServiceResponse\": { \"cmmMsgHeader\": { \"errMsg\": \"SERVICE_KEY_IS_NOT_REGISTERED_ERROR\", \"returnAuthMsg\": \"등록되지 않은 서비스키\", \"returnReasonCode\": \"30\" } } })"
+      "ok": true,
+      "count": 46,
+      "fetched_at": "2026-10-10T07:17:05+09:00",
+      "fields": []
     }
   },
   "place_fill": {
-    "checked_at": "2026-10-09T18:26:28+09:00",
+    "checked_at": "2026-10-10T07:17:22+09:00",
     "tourapi_calls": 0,
     "osm_lookups": 0,
     "unfinished": false,
