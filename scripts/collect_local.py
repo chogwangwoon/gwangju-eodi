@@ -32,7 +32,7 @@ OUT_LIBRARIES = u.DATA_DIR / "libraries.json"
 OUT_HOLIDAYS = u.DATA_DIR / "holidays.json"
 REFRESH_DAYS = 6           # 이 기간 안에 받은 파일이 있으면 건너뜀 (호출 한도 절약)
 STD_BASE = "http://api.data.go.kr/openapi"
-RAW_DIR = u.ROOT / "raw"   # 공공데이터포털에서 받은 표준데이터 CSV 를 넣어 두는 곳
+RAW_DIR = u.ROOT / "raw"   # 표준데이터 CSV 를 넣어 두는 곳 (저장소 맨 바깥에 둬도 됨)
 
 # 표준데이터는 API 신청이 막혀 있어 'CSV 파일'로 받는다. 한글 열 이름 → 앱 내부 이름
 CSV_PROGRAM_COLS = {"강좌명": "lctreNm", "강사명": "instrctrNm", "교육시작일자": "edcStartDay", "교육종료일자": "edcEndDay",
@@ -51,10 +51,10 @@ CSV_LIBRARY_COLS = {"도서관명": "lbrryNm", "시도명": "ctprvnNm", "시군�
 
 def read_csv_rows(must_have: str, cols: dict):
     """raw/ 폴더의 CSV 중 must_have 열이 있는 가장 최근 파일을 읽는다. (없으면 None)"""
-    if not RAW_DIR.exists():
-        return None, None
     best = None
-    for f in sorted(RAW_DIR.glob("*.csv")):
+    files = sorted(RAW_DIR.glob("*.csv")) if RAW_DIR.exists() else []
+    files += sorted(u.ROOT.glob("*.csv"))     # 저장소 맨 바깥에 올린 CSV 도 찾는다
+    for f in files:
         raw = f.read_bytes()
         for enc in ("utf-8-sig", "cp949"):
             try:
