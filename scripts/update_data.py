@@ -638,7 +638,7 @@ def culture_events():
                     continue
                 seq = r.get("seq") or r.get("id") or ""
                 title = clean_api_text(r.get("title"))
-                if re.search(r"(교육생|수강생|훈련생|참가자|단원|작가)\s*모집|취업|채용|양성과정|장기과정|사관학교|부트캠프", title):
+                if RECRUIT_RE.search(title):
                     continue          # 취업·교육생 모집 공고는 동네 여가 정보가 아니라서 뺀다
                 if not seq or not title or seq in seen:
                     continue
@@ -854,6 +854,20 @@ def loose_title(e):
     return t[:12]
 
 
+RECRUIT_RE = re.compile(r"(교육생|수강생|훈련생|참가자|참여자|참여기업|단원|작가)\s*모집|모집\s*공고|취업|채용|양성과정|장기과정|사관학교|부트캠프")
+
+
+def tidy_event(e):
+    """자동 수집 일정 공통 정리: 깨진 기호(&middot; 등) 풀기. 모집 공고면 None."""
+    e = dict(e)
+    for k in ("title", "venue", "price", "time", "description", "program"):
+        if isinstance(e.get(k), str):
+            e[k] = clean_api_text(e[k])
+    if RECRUIT_RE.search(e.get("title", "")):
+        return None
+    return e
+
+
 def title_core(t):
     t = re.sub(r"\[[^\]]*\]|《[^》]*》|<[^>]*>|〈[^〉]*〉|\([^)]*\)", " ", t or "")
     return re.sub(r"^(?:20\d{2}|제?\d+회)+", "", norm_title(t))
@@ -928,6 +942,7 @@ def main():
             statuses.append({"id": source_id, "name": source_name, "ok": False, "count": 0,
                              "message": scrub(f"수집 실패 · 지난 자료 {len(kept)}건 유지 ({str(e)[:200]})")})
 
+    api_events = [t for t in (tidy_event(e) for e in api_events) if t]   # 지난 자료에도 정리 규칙 적용
     merged = merge_events(manual, api_events)
     if api_events or not previous:
         write_json(OUT_EVENTS, merged)
