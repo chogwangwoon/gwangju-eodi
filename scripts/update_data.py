@@ -11,7 +11,7 @@
 """
 
 from __future__ import annotations
-import os, json, re, urllib.parse, urllib.request
+import os, json, re, time, urllib.error, urllib.parse, urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -156,10 +156,53 @@ def match_venue(name, addr=""):
                 best = (score, v.get("id"))
     return best[1] if best else None
 
-def http_get(url: str, timeout=30) -> bytes:
+def scrub(text) -> str:
+    """공개되는 meta.json 에 인증키가 절대 찍히지 않게 지운다."""
+    t = str(text)
+    for k in {DATA_KEY, KOPIS_KEY, urllib.parse.quote(DATA_KEY or "", safe=""), urllib.parse.quote_plus(DATA_KEY or "")}:
+        if k and len(k) > 8:
+            t = t.replace(k, "***")
+    return re.sub(r"(serviceKey|ServiceKey|service)=[^&\s]+", r"\1=***", t)
+
+
+def http_get(url: str, timeout=20) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read()
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.read()
+    except urllib.error.HTTPError as e:
+        # 서버가 보낸 설명(어떤 변수가 틀렸는지 등)을 같이 남겨서 원인을 바로 알 수 있게
+        try:
+            body = e.read().decode("utf-8", "replace")
+        except Exception:
+            body = ""
+        body = re.sub(r"<[^>]+>", " ", body)
+        body = re.sub(r"serviceKey=[^&\s]+", "serviceKey=***", re.sub(r"\s+", " ", body)).strip()
+        raise RuntimeError(scrub(f"HTTP {e.code} {e.reason} · {body[:220]}")) from None
+
+
+# ── 오래 걸리지 않게 막는 장치 ──
+SOURCE_BUDGET = 6 * 60      # 출처 하나당 최대 6분. 넘으면 그때까지 받은 것만 쓰고 다음으로
+_FAILS = {}
+
+
+def log(*a):
+    print(*a, flush=True)
+
+
+def guarded(name, fn, *a, **k):
+    """상세정보 호출이 3번 연속 실패하면, 이번 실행에선 그 상세정보를 더 묻지 않는다(멈춤·지연 방지)."""
+    if _FAILS.get(name, 0) >= 3:
+        raise RuntimeError(f"{name} 상세 건너뜀")
+    try:
+        r = fn(*a, **k)
+        _FAILS[name] = 0
+        return r
+    except Exception:
+        _FAILS[name] = _FAILS.get(name, 0) + 1
+        if _FAILS[name] == 3:
+            log(f"  ⚠ {name} 상세정보가 계속 실패해 이번엔 목록 정보만 씁니다")
+        raise
 
 def ymd(v):
     s = re.sub(r"\D", "", str(v or ""))
@@ -317,8 +360,9 @@ def tourapi_festivals():
     out = []
     page_no = 1
     num_rows = 100
+    deadline = time.time() + SOURCE_BUDGET
 
-    while True:
+    while time.time() < deadline:
         params = {
             "serviceKey": DATA_KEY,
             "MobileOS": "ETC",
@@ -390,18 +434,19 @@ def tourapi_festivals():
                 out.append(cached)
                 continue
 
+            slow = time.time() > deadline - 60     # 시간이 빠듯하면 상세는 생략
             try:
-                intro = tourapi_detail_intro(content_id)
+                intro = {} if slow else guarded("관광공사", tourapi_detail_intro, content_id)
             except Exception:
                 intro = {}
 
             try:
-                common = tourapi_detail_common(content_id)
+                common = {} if slow else guarded("관광공사", tourapi_detail_common, content_id)
             except Exception:
                 common = {}
 
             try:
-                images = tourapi_detail_images(content_id)
+                images = [] if slow else guarded("관광공사", tourapi_detail_images, content_id)
             except Exception:
                 images = []
 
@@ -460,6 +505,7 @@ def tourapi_festivals():
                 ],
             })
 
+        log(f"  관광공사 {page_no}쪽 · 전국 {total_count:,}건 중 광주·전남 {len(out)}건")
         # 현재 페이지까지 다 읽었으면 종료
         if page_no * num_rows >= total_count:
             break
@@ -524,23 +570,39 @@ def _culture_once(op, params):
     return recs
 
 
+# 페이지 변수 이름 표기가 서비스마다 달라서, 되는 방식을 찾으면 기억해 둔다
+CULTURE_PAGING = [("PageNo", "numOfrows"), ("pageNo", "numOfRows"), ("cPage", "rows")]
+_CULTURE_STYLE = {}
+
+
 def culture_xml(kind, **params):
     """kind: 'period' 또는 'detail'. 레코드 목록을 돌려준다."""
-    params["serviceKey"] = DATA_KEY
-    # 페이지 파라미터는 옛 방식(cPage/rows)과 포털 방식(pageNo/numOfRows)을 함께 보낸다
-    if "cPage" in params:
-        params.setdefault("pageNo", params["cPage"])
-        params.setdefault("numOfRows", params.get("rows", "100"))
+    page, rows = params.pop("cPage", None), params.pop("rows", None)
     ops = [_CULTURE_OK[kind]] if kind in _CULTURE_OK else CULTURE_OPS[kind]
-    last = None
+    styles = [_CULTURE_STYLE[kind]] if kind in _CULTURE_STYLE else CULTURE_PAGING
+    tries = []
     for op in ops:
-        try:
-            recs = _culture_once(op, dict(params))
-            _CULTURE_OK[kind] = op
-            return recs
-        except Exception as e:      # 404 등 → 다음 이름 시도
-            last = e
-    raise RuntimeError(f"문화정보원 {kind} 호출 실패 ({'/'.join(ops)}): {last}")
+        for st in styles:
+            # serviceTp 가 없는 버전도 한 번 시도
+            for drop_tp in ((False, True) if "serviceTp" in params and kind not in _CULTURE_STYLE else (False,)):
+                q = {"serviceKey": DATA_KEY, **{k: v for k, v in params.items() if not (drop_tp and k == "serviceTp")}}
+                if page is not None:
+                    q[st[0]], q[st[1]] = page, rows or "100"
+                try:
+                    recs = _culture_once(op, q)
+                    _CULTURE_OK[kind], _CULTURE_STYLE[kind] = op, st
+                    if kind == "period" and len(tries) and not getattr(culture_xml, "_said", False):
+                        log(f"  문화정보원: '{op}' + {st[0]}/{st[1]}{' (serviceTp 없이)' if drop_tp else ''} 방식으로 연결됨")
+                        culture_xml._said = True
+                    return recs
+                except Exception as e:
+                    tries.append(f"{op}/{st[0]}{'-tp' if drop_tp else ''}: {str(e)[:120]}")
+                    if "404" in str(e):
+                        break          # 기능 이름 자체가 없음 → 다음 이름으로
+            else:
+                continue
+            break
+    raise RuntimeError(f"문화정보원 {kind} 호출 실패 → " + " | ".join(tries[:3]))
 
 
 def culture_category(realm, tp):
@@ -561,8 +623,11 @@ def culture_events():
         raise RuntimeError("DATA_GO_KR_KEY가 없습니다.")
     frm, to = NOW.strftime("%Y%m%d"), (NOW + timedelta(days=45)).strftime("%Y%m%d")
     out, seen = [], set()
+    deadline = time.time() + SOURCE_BUDGET
     for tp, tp_name in CULTURE_TYPES.items():
         for page in range(1, 41):
+            if time.time() > deadline:
+                log("  문화정보원: 시간 예산 도달 → 여기까지만"); break
             recs = culture_xml("period", **{"from": frm, "to": to, "cPage": str(page), "rows": "100", "serviceTp": tp})
             for r in recs:
                 place_text = " ".join([r.get("area", ""), r.get("sigungu", ""), r.get("place", "")])
@@ -586,7 +651,9 @@ def culture_events():
 
                 d = {}
                 try:   # 상세: 가격·주소·전화·원문 링크 (없어도 목록 정보만으로 표시)
-                    recs_d = culture_xml("detail", seq=seq)
+                    if time.time() > deadline - 60:
+                        raise RuntimeError("시간 예산")
+                    recs_d = guarded("문화정보원", culture_xml, "detail", seq=seq)
                     d = recs_d[0] if recs_d else {}
                 except Exception:
                     pass
@@ -626,6 +693,7 @@ def culture_events():
                 })
             if len(recs) < 100:
                 break
+        log(f"  문화정보원 {tp_name}: 지금까지 광주·전남 {len(out)}건")
     return out
 
 
@@ -647,7 +715,7 @@ def kopis_facility_addr(mt10id):
         return ""
     if mt10id not in _FACILITY:
         try:
-            _FACILITY[mt10id] = (kopis_xml(f"prfplc/{mt10id}").findtext(".//adres") or "").strip()
+            _FACILITY[mt10id] = (guarded("KOPIS 공연장", kopis_xml, f"prfplc/{mt10id}").findtext(".//adres") or "").strip()
         except Exception:
             _FACILITY[mt10id] = ""
     return _FACILITY[mt10id]
@@ -660,7 +728,10 @@ def kopis_performances():
 
     rows_per_page = 100
     hits = []
+    deadline = time.time() + SOURCE_BUDGET
     for page in range(1, 61):                      # 최대 6,000건까지
+        if time.time() > deadline - 120:
+            log("  KOPIS 목록: 시간 예산 도달 → 여기까지만"); break
         root = kopis_xml("pblprfr", stdate=NOW.strftime("%Y%m%d"),
                          eddate=(NOW + timedelta(days=45)).strftime("%Y%m%d"),
                          cpage=str(page), rows=str(rows_per_page))
@@ -668,8 +739,11 @@ def kopis_performances():
         for db in dbs:
             if in_region(db.findtext("area") or ""):
                 hits.append(db)
+        if page % 10 == 0:
+            log(f"  KOPIS 목록 {page}쪽 · 광주·전남 {len(hits)}건")
         if len(dbs) < rows_per_page:
             break
+    log(f"  KOPIS 광주·전남 공연 {len(hits)}건 · 상세 받는 중")
 
     out = []
     for db in hits:
@@ -693,7 +767,9 @@ def kopis_performances():
         # 상세: 가격·시간·출연·공연장 주소 (새 공연이거나 7일 지난 것만)
         detail = {}
         try:
-            d = kopis_xml(f"pblprfr/{mid}").find(".//db")
+            if time.time() > deadline:
+                raise RuntimeError("시간 예산")
+            d = guarded("KOPIS", kopis_xml, f"pblprfr/{mid}").find(".//db")
             if d is not None:
                 detail = {t: (d.findtext(t) or "").strip() for t in
                           ("pcseguidance", "dtguidance", "prfcast", "prfruntime", "prfage", "mt10id", "entrpsnmP")}
@@ -787,7 +863,9 @@ def main():
         ("culture", "문화정보원 전시·체험", culture_events),
     ]:
         try:
+            t0 = time.time(); log(f"▶ {source_name} 수집 시작")
             rows = fn()
+            log(f"✔ {source_name} {len(rows)}건 ({int(time.time() - t0)}초)")
             api_events.extend(rows)
             statuses.append({"id": source_id, "name": source_name, "ok": True, "count": len(rows), "message": "정상 수집"})
         except Exception as e:
@@ -795,7 +873,7 @@ def main():
             kept = [p for p in previous if p.get("api") == source_id or p.get("origin") == source_id]
             api_events.extend(kept)
             statuses.append({"id": source_id, "name": source_name, "ok": False, "count": 0,
-                             "message": f"수집 실패 · 지난 자료 {len(kept)}건 유지 ({str(e)[:200]})"})
+                             "message": scrub(f"수집 실패 · 지난 자료 {len(kept)}건 유지 ({str(e)[:200]})")})
 
     merged = merge_events(manual, api_events)
     if api_events or not previous:

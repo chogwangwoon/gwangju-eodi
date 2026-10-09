@@ -17,6 +17,7 @@ import hashlib
 import json
 import re
 import sys
+import time
 import urllib.parse
 from datetime import datetime
 from pathlib import Path
@@ -42,11 +43,24 @@ def pick(row: dict, *names, default=""):
     return default
 
 
-def std_rows(service: str, max_pages=120, **filters):
+def std_rows(service: str, max_pages=120, budget=25 * 60, **filters):
     rows, total = [], None
+    rows_n = ROWS
+    deadline = time.time() + budget
     for page in range(1, max_pages + 1):
-        params = {"serviceKey": u.DATA_KEY, "pageNo": str(page), "numOfRows": str(ROWS), "type": "json", **filters}
-        raw = u.http_get(f"{STD_BASE}/{service}?" + urllib.parse.urlencode(params), timeout=60)
+        if time.time() > deadline:
+            raise RuntimeError(f"시간 예산 초과 ({len(rows):,}/{total or 0:,}건에서 중단)")
+        params = {"serviceKey": u.DATA_KEY, "pageNo": str(page), "numOfRows": str(rows_n), "type": "json", **filters}
+        try:
+            raw = u.http_get(f"{STD_BASE}/{service}?" + urllib.parse.urlencode(params), timeout=90)
+        except RuntimeError as e:
+            if "HTTP 400" in str(e) and rows_n > 100 and page == 1:
+                rows_n = 100                      # 한 번에 1,000건이 안 되는 서비스 → 100건씩
+                print("  한 번에 받는 양을 100건으로 줄여 다시 시도", flush=True)
+                params["numOfRows"] = "100"
+                raw = u.http_get(f"{STD_BASE}/{service}?" + urllib.parse.urlencode(params), timeout=90)
+            else:
+                raise
         text = raw.decode("utf-8", "replace").strip()
         if not text.startswith("{"):
             # 인증 실패 등은 XML로 온다
@@ -70,7 +84,9 @@ def std_rows(service: str, max_pages=120, **filters):
             items = [items]
         rows.extend(items)
         total = int(body.get("totalCount") or 0)
-        if page * ROWS >= total or not items:
+        if page == 1 or page % 10 == 0:
+            print(f"  {service}: {len(rows):,} / {total:,}건 받는 중", flush=True)
+        if page * rows_n >= total or not items:
             break
     return rows
 
@@ -133,7 +149,7 @@ def collect_programs():
             "days": pick(r, "operDay", "operDayCn"),
             "target": pick(r, "edcTrgetType", "edcTrgetSe"),
             "method": pick(r, "edcMthType", "edcMthSe"),
-            "capacity": pick(r, "psncpa", "lctreCo", "edcPsncpa"),
+            "capacity": pick(r, "psncpa", "edcPsncpa"),
             "fee": "무료" if free else (f"{int(fee):,}원" if fee.isdigit() else fee),
             "free": free,
             "applyStart": r_start,
@@ -142,7 +158,7 @@ def collect_programs():
             "select": pick(r, "slctnMthType", "slctnMthSe"),
             "phone": pick(r, "operPhoneNumber", "phoneNumber"),
             "url": pick(r, "homepageUrl", "hmpgAddr"),
-            "desc": pick(r, "lctreCn", "lctreCont")[:300],
+            "desc": pick(r, "lctreCo", "lctreCn", "lctreCont")[:300],   # lctreCo = 강좌내용
             "source": "전국평생학습강좌표준데이터",
             "verified": u.TODAY_ISO,
         })
@@ -236,9 +252,9 @@ def main():
     meta = u.read_json(u.OUT_META, {})
     local = meta.get("local", {})
     for stem, path, fn, label in [
-        ("programs", OUT_PROGRAMS, collect_programs, "평생학습 강좌"),
+        ("holidays", OUT_HOLIDAYS, collect_holidays, "공휴일"),          # 빠른 것부터
         ("libraries", OUT_LIBRARIES, collect_libraries, "도서관"),
-        ("holidays", OUT_HOLIDAYS, collect_holidays, "공휴일"),
+        ("programs", OUT_PROGRAMS, collect_programs, "평생학습 강좌"),   # 전국 자료라 가장 오래 걸림 → 마지막
     ]:
         if not force and recent(path):
             print(f"{label}: 최근에 받아서 건너뜀")
@@ -257,10 +273,11 @@ def main():
             prev = local.get(stem, {})
             local[stem] = {"name": label, "ok": False, "count": prev.get("count", 0),
                            "fetched_at": prev.get("fetched_at"),
-                           "message": f"수집 실패 · 지난 자료 유지 ({str(e)[:200]})"}
-        print(label, json.dumps({k: v for k, v in local[stem].items() if k != "fields"}, ensure_ascii=False))
-    meta["local"] = local
-    u.write_json(u.OUT_META, meta)
+                           "message": u.scrub(f"수집 실패 · 지난 자료 유지 ({str(e)[:200]})")}
+        print(label, json.dumps({k: v for k, v in local[stem].items() if k != "fields"}, ensure_ascii=False), flush=True)
+        meta = u.read_json(u.OUT_META, {})
+        meta["local"] = local
+        u.write_json(u.OUT_META, meta)
 
 
 if __name__ == "__main__":

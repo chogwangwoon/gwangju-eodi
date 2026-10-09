@@ -41,6 +41,7 @@ LISTS = {  # 앱 데이터 이름 : 종류
     "cinemas": "place",
 }
 MAX_TOUR_CALLS = 450        # 하루 호출 한도(개발계정 1,000회)를 넘지 않도록 한 번 실행당 상한
+RUN_BUDGET = 15 * 60        # 이 시간이 지나면 찾기를 멈추고 지금까지 결과를 저장 (나머지는 다음 실행 때)
 MAX_OSM_LOOKUPS = 400       # OpenStreetMap은 1초에 1번 규칙 → 한 번 실행에 약 8분 이내
 RETRY_MISS_DAYS = 14
 UA = "gwangju-eodi/1.0 (https://github.com/chogwangwoon/gwangju-eodi)"
@@ -120,13 +121,28 @@ class Temporary(Exception):
 
 
 # ───────── OpenStreetMap (앱의 브라우저 위치찾기와 같은 규칙) ─────────
+osm_fail = 0                # 지도 서비스 연속 실패 횟수
+
+
 def osm_json(url: str):
-    global osm_calls
+    """OpenStreetMap 조회. 5번 연속 실패(차단·지연)하면 이번 실행에선 더 묻지 않는다."""
+    global osm_calls, osm_fail
+    if osm_fail >= 5:
+        raise Temporary("OpenStreetMap 응답 없음 → 이번 실행은 건너뜀")
     osm_calls += 1
     time.sleep(1.1)                                     # 1초에 1번 이용 규칙
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=20) as r:
-        return json.loads(r.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=8) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        osm_fail = 0
+        return data
+    except Exception:
+        osm_fail += 1
+        if osm_fail == 5:
+            print("  ⚠ OpenStreetMap이 응답하지 않아 이번 실행에선 관광공사 자료로만 찾습니다", flush=True)
+        raise Temporary("OpenStreetMap 연결 실패")   # 네트워크 문제는 '못 찾음'이 아니라 '다음에 다시'
+
 
 
 def osm_find(x: dict):
@@ -147,6 +163,8 @@ def osm_find(x: dict):
             pn = u.norm_title((f.get("properties") or {}).get("name", ""))
             if in_area(lat, lng) and len(core) >= 3 and pn and (core in pn or pn in core):
                 return {"lat": round(lat, 6), "lng": round(lng, 6), "geoSrc": "OpenStreetMap(이름)"}
+    except Temporary:
+        raise
     except Exception:
         pass
     # 2) 주소 (도로명 + 건물번호가 정확히 맞을 때만)
@@ -160,6 +178,8 @@ def osm_find(x: dict):
                 rd = (r.get("address") or {}).get("road", "")
                 if in_area(lat, lng) and hn == no and street in rd:
                     return {"lat": round(lat, 6), "lng": round(lng, 6), "geoSrc": "OpenStreetMap(주소)"}
+        except Temporary:
+            raise
         except Exception:
             pass
     return None
@@ -244,6 +264,8 @@ def main():
     cache = u.read_json(CACHE_FILE, {})
     stats = {}
     stopped = False
+    deadline = time.time() + RUN_BUDGET
+    looked = 0
 
     for list_name, kind in LISTS.items():
         rows = data.get(list_name) or []
@@ -254,7 +276,13 @@ def main():
             stale_miss = hit and hit.get("miss") and (
                 datetime.strptime(u.TODAY_ISO, "%Y-%m-%d") - datetime.strptime(hit["miss"], "%Y-%m-%d")
             ).days >= RETRY_MISS_DAYS
+            if not stopped and time.time() > deadline:
+                stopped = True
+                print("  시간 예산 도달 → 지금까지 찾은 것만 저장하고, 나머지는 다음 실행 때", flush=True)
             if needs_lookup(x, kind) and (hit is None or stale_miss) and not stopped:
+                looked += 1
+                if looked % 25 == 0:
+                    print(f"  장소 정보 찾는 중 {looked}곳 (관광공사 {tour_calls}회 · 지도 {osm_calls}회)", flush=True)
                 try:
                     hit = lookup(x, kind)
                     cache[key] = hit
