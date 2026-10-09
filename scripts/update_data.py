@@ -704,6 +704,7 @@ KOPIS_BASE = "http://www.kopis.or.kr/openApi/restful"
 KOPIS_MUSIC = ("대중음악", "서양음악(클래식)", "한국음악(국악)", "클래식", "국악")
 
 def kopis_xml(path, **params):
+    time.sleep(0.5)          # KOPIS 는 짧은 시간에 많이 물으면 차단(Request Blocked)한다 → 천천히
     params["service"] = KOPIS_KEY
     url = f"{KOPIS_BASE}/{path}?" + urllib.parse.urlencode(params)
     root = ET.fromstring(http_get(url))
@@ -732,20 +733,44 @@ def kopis_performances():
     rows_per_page = 100
     hits = []
     deadline = time.time() + SOURCE_BUDGET
-    for page in range(1, 61):                      # 최대 6,000건까지
-        if time.time() > deadline - 120:
-            log("  KOPIS 목록: 시간 예산 도달 → 여기까지만"); break
-        root = kopis_xml("pblprfr", stdate=NOW.strftime("%Y%m%d"),
-                         eddate=(NOW + timedelta(days=45)).strftime("%Y%m%d"),
-                         cpage=str(page), rows=str(rows_per_page))
-        dbs = root.findall(".//db")
-        for db in dbs:
+    period = dict(stdate=NOW.strftime("%Y%m%d"), eddate=(NOW + timedelta(days=45)).strftime("%Y%m%d"))
+
+    def pages(extra, max_pages):
+        got = []
+        for page in range(1, max_pages + 1):
+            if time.time() > deadline - 120:
+                log("  KOPIS 목록: 시간 예산 도달 → 여기까지만"); break
+            dbs = kopis_xml("pblprfr", **period, cpage=str(page), rows=str(rows_per_page), **extra).findall(".//db")
+            got.extend(dbs)
+            if len(dbs) < rows_per_page:
+                break
+        return got
+
+    # 1) 지역코드(광주 29 · 전남 46)로 좁혀서 묻기 → 몇 번만 물으면 끝 (차단 위험 ↓)
+    for code in ("29", "46"):
+        dbs = pages({"signgucode": code}, 10)
+        inr = [d for d in dbs if in_region(d.findtext("area") or "")]
+        if dbs and len(inr) >= len(dbs) * 0.8:
+            hits.extend(inr)
+        elif dbs:
+            log(f"  KOPIS 지역코드 {code} 가 통하지 않음 → 전국 목록에서 거르기")
+            hits = []
+            break
+    else:
+        log(f"  KOPIS 지역코드로 광주·전남 {len(hits)}건")
+    # 2) 지역코드가 안 통하면 전국 목록을 넘기며 거르기 (최대 30쪽)
+    if not hits:
+        for db in pages({}, 30):
             if in_region(db.findtext("area") or ""):
                 hits.append(db)
-        if page % 10 == 0:
-            log(f"  KOPIS 목록 {page}쪽 · 광주·전남 {len(hits)}건")
-        if len(dbs) < rows_per_page:
-            break
+        log(f"  KOPIS 전국 목록에서 광주·전남 {len(hits)}건")
+    # 같은 공연이 두 번 잡히지 않게
+    seen_ids, uniq = set(), []
+    for d in hits:
+        mid = d.findtext("mt20id")
+        if mid and mid not in seen_ids:
+            seen_ids.add(mid); uniq.append(d)
+    hits = uniq
     log(f"  KOPIS 광주·전남 공연 {len(hits)}건 · 상세 받는 중")
 
     out = []
