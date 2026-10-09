@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  issues: read
 
 jobs:
   update:
@@ -22,17 +23,37 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: TourAPI + KOPIS 데이터 수집
+      - name: 일정 수집 (관광공사 · KOPIS · 문화정보원)
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           KOPIS_API_KEY: ${{ secrets.KOPIS_API_KEY }}
         run: python scripts/update_data.py
 
+      - name: 동네 강좌·도서관 수집 (주 1회)
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python scripts/collect_local.py
+
+      - name: 정보 수정 제보 표시 (열린 이슈 읽기)
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/collect_flags.py
+
+      - name: 장소 위치·영업정보 보강 (빈칸만 채움)
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python scripts/enrich_places.py
+
       - name: 바뀐 데이터 저장
         run: |
           git config user.name "gwangju-eodi-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/data/
+          git add -A docs/data scripts
           if git diff --cached --quiet; then
             echo "변경된 데이터가 없습니다."
           else
