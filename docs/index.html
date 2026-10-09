@@ -191,7 +191,7 @@ button.briefCard{cursor:pointer}
   text-overflow:ellipsis;
 }
 .briefCard.hot strong{color:var(--red)}
-.briefCard.ticket strong{color:#7c3aed}
+.briefCard.bTicket strong{color:#7c3aed}
 .briefCard.fresh strong{color:#1e6b3b}
 .briefDetail{
   display:none;
@@ -1554,11 +1554,11 @@ button{min-height:var(--tap)}
     <div class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="22" cy="10" r="4" fill="#e6a136"/><path d="M2 26 L10 15 L14 19 L19 12 L30 26Z" fill="#fff"/><path d="M2 26 L10 15 L13 18.5 L9 26Z" fill="#cfe0d5"/></svg></div>
     <div><b>오늘, 전남광주 어디로?</b><small>광주·전남 전시·공연·맛집·나들이 한눈에</small></div>
   </div>
-  <label class="search"><span>⌕</span><input id="search" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="뭐든 찾아보쇼잉 — 펭귄마을, 보리밥, 강아지, 실내"></label>
+  <label class="search"><span>⌕</span><input id="search" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="뭐든 찾아보쇼잉 — 도서관, 동네, 요가, 보리밥"></label>
   <button id="install" class="install hidden">📲 앱 설치</button>
 </div>
 <div class="regionBar" id="regionBar" role="tablist" aria-label="권역 고르기"></div>
-<div class="topSearch"><label class="search"><span>⌕</span><input id="search2" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="뭐든 찾아보쇼잉 — 펭귄마을, 보리밥, 강아지"></label></div>
+<div class="topSearch"><label class="search"><span>⌕</span><input id="search2" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="뭐든 찾아보쇼잉 — 도서관, 동네, 요가, 보리밥"></label></div>
 </header>
 <div class="wrap"><div class="homeBar" id="homeBar"></div></div>
 
@@ -1875,7 +1875,7 @@ function renderDailyBrief(){
     <button class="briefCard" onclick="openBrief()"><strong>${live.length}</strong><span>오늘 가능한 일정</span><small>${live.length?"현재 진행·오늘 이용 가능":"등록 일정 없음"}</small></button>
     <button class="briefCard hot" onclick="openBrief()"><strong>${endingToday.length}</strong><span>오늘 종료</span><small>${endingToday.length?esc(endingToday[0].title):"오늘 종료 일정 없음"}</small></button>
     <button class="briefCard fresh" onclick="openBrief()"><strong>${fresh.length}</strong><span>새로 등록·확인</span><small>${fresh.length?esc(fresh[0].title):"새 항목 없음"}</small></button>
-    <button class="briefCard ticket" onclick="openBrief()"><strong>${ticket.length}</strong><span>예매 오픈 예정</span><small>${ticket.length?esc(ticket[0].title):"예정 없음"}</small></button>`;
+    <button class="briefCard bTicket" onclick="openBrief()"><strong>${ticket.length}</strong><span>예매 오픈 예정</span><small>${ticket.length?esc(ticket[0].title):"예정 없음"}</small></button>`;
   const list=(title,arr,empty)=>`<div class="briefList"><b>${title}</b>${arr.length?arr.slice(0,5).map(e=>`<button onclick="briefOpenItem('${esc(e.id)}')">${esc(e.title)}${e.venue?` · ${esc(e.venue)}`:""}</button>`).join(""):`<small>${empty}</small>`}</div>`;
   detailBox.innerHTML=
     list("오늘 가능한 일정",live,"오늘 이용 가능한 등록 일정이 없어요.")+
@@ -4021,6 +4021,11 @@ function hits(q, item, fields) { const h = norm(fields.map(f => item[f]).join(" 
 function renderSearch() {
   const q = $("#search").value.trim();
   if (!q) { $("#searchView").classList.add("hidden"); return }
+  if (/^(우리\s*)?동네(\s*(탭|정보|강좌|도서관))?$/.test(q)) {     // '동네' 만 치면 동네 탭(도서관·강좌·체험)으로
+    const g = q.match(/강좌|도서관/); clearSearch(); showTab("local");
+    if (g) setTimeout(() => document.querySelector(g[0] === "강좌" ? "#localView .subchips:last-of-type" : "#localView h3.sub")?.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+    return;
+  }
   // 섬 방문의 해는 독립 관광정책입니다. '섬진강'과 '방문'이 각기 다른
   // 설명에 있는 곳이 엉뚱하게 검색되지 않도록 구문 단위로 판정합니다.
   const islandVisitIntent = /섬방문|섬여행|섬관광/.test(norm(q)) && !/박람회|엑스포/.test(norm(q));
