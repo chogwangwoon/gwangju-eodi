@@ -13,7 +13,9 @@
 """
 from __future__ import annotations
 
+import csv
 import hashlib
+import io
 import json
 import re
 import sys
@@ -30,6 +32,45 @@ OUT_LIBRARIES = u.DATA_DIR / "libraries.json"
 OUT_HOLIDAYS = u.DATA_DIR / "holidays.json"
 REFRESH_DAYS = 6           # 이 기간 안에 받은 파일이 있으면 건너뜀 (호출 한도 절약)
 STD_BASE = "http://api.data.go.kr/openapi"
+RAW_DIR = u.ROOT / "raw"   # 공공데이터포털에서 받은 표준데이터 CSV 를 넣어 두는 곳
+
+# 표준데이터는 API 신청이 막혀 있어 'CSV 파일'로 받는다. 한글 열 이름 → 앱 내부 이름
+CSV_PROGRAM_COLS = {"강좌명": "lctreNm", "강사명": "instrctrNm", "교육시작일자": "edcStartDay", "교육종료일자": "edcEndDay",
+    "교육시작시각": "edcStartTime", "교육종료시각": "edcColseTime", "강좌내용": "lctreCo", "교육대상구분": "edcTrgetType",
+    "교육방법구분": "edcMthType", "운영요일": "operDay", "교육장소": "edcPlace", "강좌정원수": "psncpa", "수강료": "lctreCost",
+    "교육장도로명주소": "edcRdnmadr", "운영기관명": "operInstitutionNm", "운영기관전화번호": "operPhoneNumber",
+    "접수시작일자": "rceptStartDate", "접수종료일자": "rceptEndDate", "접수방법구분": "rceptMthType", "선정방법구분": "slctnMthType",
+    "홈페이지주소": "homepageUrl", "데이터기준일자": "referenceDate", "제공기관명": "instt_nm"}
+CSV_LIBRARY_COLS = {"도서관명": "lbrryNm", "시도명": "ctprvnNm", "시군구명": "signguNm", "도서관유형": "lbrrySe", "휴관일": "closeDay",
+    "평일운영시작시각": "weekdayOperOpenHhmm", "평일운영종료시각": "weekdayOperColseHhmm",
+    "토요일운영시작시각": "satOperOperOpenHhmm", "토요일운영종료시각": "satOperCloseHhmm",
+    "공휴일운영시작시각": "holidayOperOpenHhmm", "공휴일운영종료시각": "holidayCloseOpenHhmm",
+    "열람좌석수": "seatCo", "자료수(도서)": "bookCo", "소재지도로명주소": "rdnmadr", "도서관전화번호": "phoneNumber",
+    "홈페이지주소": "homepageUrl", "위도": "latitude", "경도": "longitude", "데이터기준일자": "referenceDate"}
+
+
+def read_csv_rows(must_have: str, cols: dict):
+    """raw/ 폴더의 CSV 중 must_have 열이 있는 가장 최근 파일을 읽는다. (없으면 None)"""
+    if not RAW_DIR.exists():
+        return None, None
+    best = None
+    for f in sorted(RAW_DIR.glob("*.csv")):
+        raw = f.read_bytes()
+        for enc in ("utf-8-sig", "cp949"):
+            try:
+                text = raw.decode(enc)
+                break
+            except UnicodeDecodeError:
+                text = None
+        if not text:
+            continue
+        head = text.split("\n", 1)[0]
+        if must_have in head and (best is None or f.stat().st_mtime >= best[0]):
+            best = (f.stat().st_mtime, f.name, text)
+    if not best:
+        return None, None
+    rows = [{cols.get(k, k): (v or "").strip() for k, v in r.items() if k} for r in csv.DictReader(io.StringIO(best[2]))]
+    return rows, best[1]
 ROWS = 1000
 
 
@@ -113,13 +154,16 @@ def hhmm(v: str) -> str:
 
 # ───────── 1) 평생학습 강좌 ─────────
 def collect_programs():
-    rows = std_rows("tn_pubr_public_lifelong_lrn_lctre_api")
+    rows, fname = read_csv_rows("강좌명", CSV_PROGRAM_COLS)
+    if rows is None:
+        raise RuntimeError("raw/ 폴더에 평생학습강좌 CSV 가 없어요 (지금 파일 유지)")
+    print(f"  {fname}: 전국 {len(rows):,}건 읽음", flush=True)
     out, seen = [], set()
     for r in rows:
         addr = pick(r, "edcRdnmadr", "edcRdnmAdr", "rdnmadr", "lnmadr", "edcPlaceAddr")
         org = pick(r, "operInstitutionNm", "insttNm")
         place = pick(r, "edcPlace", "edcPlc")
-        if not u.in_region(" ".join([addr, org])):
+        if not u.in_region(" ".join([addr, org, pick(r, "instt_nm")])):
             continue
         name = pick(r, "lctreNm", "lctreNmCn")
         start = u.ymd(pick(r, "edcStartDay", "edcBgnde", "edcStartDate"))
@@ -172,20 +216,15 @@ def collect_programs():
 
 # ───────── 2) 도서관 ─────────
 def collect_libraries():
-    rows = []
-    for sido in ("광주광역시", "전라남도", "전남광주통합특별시"):
-        try:
-            rows += std_rows("tn_pubr_public_lbrry_api", max_pages=10, ctprvnNm=sido)
-        except RuntimeError as e:
-            if "NODATA" not in str(e).upper():
-                raise
-    if not rows:   # 시도 이름 필터가 안 먹는 경우: 전체를 받아서 거른다
-        rows = std_rows("tn_pubr_public_lbrry_api", max_pages=30)
+    rows, fname = read_csv_rows("도서관명", CSV_LIBRARY_COLS)
+    if rows is None:
+        raise RuntimeError("raw/ 폴더에 도서관 CSV 가 없어요 (지금 파일 유지)")
+    print(f"  {fname}: 전국 {len(rows):,}곳 읽음", flush=True)
     out, seen = [], set()
     for r in rows:
         sido = pick(r, "ctprvnNm")
         addr = pick(r, "rdnmadr", "lnmadr")
-        if not u.in_region(" ".join([sido, addr])):
+        if sido not in ("광주광역시", "전라남도", "전남광주통합특별시") and not (not sido and u.in_region(addr)):
             continue
         name = pick(r, "lbrryNm")
         key = u.norm_title(name + addr)
@@ -194,6 +233,8 @@ def collect_libraries():
         seen.add(key)
         def span(a, b):
             o, c = hhmm(pick(r, *a)), hhmm(pick(r, *b))
+            if o == c == "00:00":
+                return "휴관"          # 표준데이터는 쉬는 날을 00:00~00:00 으로 적는다
             return f"{o}~{c}" if o and c and o != c else ""
         out.append({
             "id": "lib-" + hashlib.md5(key.encode()).hexdigest()[:10],
@@ -256,11 +297,11 @@ def main():
         ("libraries", OUT_LIBRARIES, collect_libraries, "도서관"),
         ("programs", OUT_PROGRAMS, collect_programs, "평생학습 강좌"),   # 전국 자료라 가장 오래 걸림 → 마지막
     ]:
-        if not force and recent(path):
+        if not force and stem == "holidays" and recent(path):
             print(f"{label}: 최근에 받아서 건너뜀")
             continue
         try:
-            if not u.DATA_KEY:
+            if stem == "holidays" and not u.DATA_KEY:
                 raise RuntimeError("DATA_GO_KR_KEY가 없습니다.")
             items, keys = fn()
             if not items and u.read_json(path, None):

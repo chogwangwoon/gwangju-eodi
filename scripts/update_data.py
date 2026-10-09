@@ -223,7 +223,10 @@ def district_from_addr(addr: str):
     return m.group(1) if m and not re.fullmatch(SIDO_RE, m.group(1)) else ""
 
 def in_region(text: str):
-    return bool(re.search(r"광주|전남|전라남", text or ""))
+    t = text or ""
+    if re.search(r"경기도|경기\s*광주|^경기", t):     # 경기도 광주시는 다른 도시
+        return False
+    return bool(re.search(r"광주|전남|전라남", t))
 
 def region_tag(district: str):
     return "광주" if district in GJ_GU else "전남"
