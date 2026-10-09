@@ -227,7 +227,9 @@ def collect_libraries():
         if sido not in ("광주광역시", "전라남도", "전남광주통합특별시") and not (not sido and u.in_region(addr)):
             continue
         name = pick(r, "lbrryNm")
-        key = u.norm_title(name + addr)
+        # '광주광역시 …' / '전남광주통합특별시 …' 처럼 앞부분만 다른 같은 도서관은 하나로
+        addr_core = re.sub(r"^(전남광주통합특별시|전남광주특별시|광주광역시|전라남도)\s*", "", addr)
+        key = u.norm_title(name + re.sub(r"\([^)]*\)", "", addr_core))
         if not name or key in seen:
             continue
         seen.add(key)

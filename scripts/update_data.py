@@ -852,6 +852,20 @@ def loose_title(e):
     return t[:12]
 
 
+def title_core(t):
+    t = re.sub(r"\[[^\]]*\]|《[^》]*》|<[^>]*>|〈[^〉]*〉|\([^)]*\)", " ", t or "")
+    return re.sub(r"^(?:20\d{2}|제?\d+회)+", "", norm_title(t))
+
+
+def same_event(a, b):
+    x, y = title_core(a.get("title")), title_core(b.get("title"))
+    if len(x) < 4 or len(y) < 4 or not (x == y or x in y or y in x):
+        return False
+    if a.get("venueId") and b.get("venueId") and a["venueId"] != b["venueId"]:
+        return False
+    return (a.get("start") or "0000") <= (b.get("end") or "9999") and (b.get("start") or "0000") <= (a.get("end") or "9999")
+
+
 def merge_events(manual, api_events):
     merged, seen, manual_titles = [], set(), set()
     for e in manual:
@@ -866,6 +880,8 @@ def merge_events(manual, api_events):
             continue
         if e.get("origin") == "auto" and len(loose_title(e)) >= 6 and loose_title(e) in manual_titles:
             continue                                  # 직접 확인한 같은 행사가 이미 있음
+        if e.get("origin") == "auto" and any(same_event(e, m) for m in manual):
+            continue                                  # 제목 한쪽이 다른 쪽에 들어 있고 기간이 겹침
         seen.add(k)
         merged.append(e)
 
