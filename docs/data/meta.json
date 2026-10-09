@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-09T11:08:40+09:00",
+  "updated_at": "2026-10-09T11:42:10+09:00",
   "auto_update": true,
   "sources": [
     {
@@ -21,7 +21,7 @@
       "name": "문화정보원 전시·체험",
       "ok": false,
       "count": 0,
-      "message": "수집 실패 · 지난 자료 0건 유지 (문화정보원 period 호출 실패 (period2/period): HTTP Error 400: Bad Request)"
+      "message": "수집 실패 · 지난 자료 0건 유지 (문화정보원 period 호출 실패 → period2/PageNo: HTTP 403 Forbidden · SERVICE_KEY_IS_NOT_REGISTERED_ERROR 등록되지 않은 서비스키 30 | period2/PageNo-tp: HTTP 403 Forbidden · SERVICE_KEY_IS_NOT_REGISTERED_ERROR 등록되지 않은 서비스키)"
     }
   ],
   "api_status": [
@@ -44,7 +44,7 @@
       "name": "문화정보원 전시·체험",
       "ok": false,
       "count": 0,
-      "message": "수집 실패 · 지난 자료 0건 유지 (문화정보원 period 호출 실패 (period2/period): HTTP Error 400: Bad Request)"
+      "message": "수집 실패 · 지난 자료 0건 유지 (문화정보원 period 호출 실패 → period2/PageNo: HTTP 403 Forbidden · SERVICE_KEY_IS_NOT_REGISTERED_ERROR 등록되지 않은 서비스키 30 | period2/PageNo-tp: HTTP 403 Forbidden · SERVICE_KEY_IS_NOT_REGISTERED_ERROR 등록되지 않은 서비스키)"
     }
   ],
   "counts": {
@@ -61,27 +61,27 @@
       "ok": false,
       "count": 0,
       "fetched_at": null,
-      "message": "수집 실패 · 지난 자료 유지 (HTTP Error 400: Bad Request)"
+      "message": "수집 실패 · 지난 자료 유지 (HTTP 400 Bad Request · { \"OpenAPI_ServiceResponse\": { \"cmmMsgHeader\": { \"errMsg\": \"NO_OPENAPI_SERVICE_ERROR\", \"returnAuthMsg\": \"해당 오픈API 서비스가 없거나 폐기됨\", \"returnReasonCode\": \"12\" } } })"
     },
     "libraries": {
       "name": "도서관",
       "ok": false,
       "count": 0,
       "fetched_at": null,
-      "message": "수집 실패 · 지난 자료 유지 (HTTP Error 403: Forbidden)"
+      "message": "수집 실패 · 지난 자료 유지 (HTTP 403 Forbidden · { \"OpenAPI_ServiceResponse\": { \"cmmMsgHeader\": { \"errMsg\": \"SERVICE_KEY_IS_NOT_REGISTERED_ERROR\", \"returnAuthMsg\": \"등록되지 않은 서비스키\", \"returnReasonCode\": \"30\" } } })"
     },
     "holidays": {
       "name": "공휴일",
       "ok": false,
       "count": 0,
       "fetched_at": null,
-      "message": "수집 실패 · 지난 자료 유지 (HTTP Error 403: Forbidden)"
+      "message": "수집 실패 · 지난 자료 유지 (HTTP 403 Forbidden · { \"OpenAPI_ServiceResponse\": { \"cmmMsgHeader\": { \"errMsg\": \"SERVICE_KEY_IS_NOT_REGISTERED_ERROR\", \"returnAuthMsg\": \"등록되지 않은 서비스키\", \"returnReasonCode\": \"30\" } } })"
     }
   },
   "place_fill": {
-    "checked_at": "2026-10-09T11:11:44+09:00",
-    "tourapi_calls": 448,
-    "osm_lookups": 372,
+    "checked_at": "2026-10-09T11:43:59+09:00",
+    "tourapi_calls": 0,
+    "osm_lookups": 0,
     "unfinished": false,
     "lists": {
       "venues": {
