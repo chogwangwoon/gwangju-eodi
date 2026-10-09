@@ -1,20 +1,20 @@
 {
-  "updated_at": "2026-10-09T11:42:10+09:00",
+  "updated_at": "2026-10-09T12:03:34+09:00",
   "auto_update": true,
   "sources": [
     {
       "id": "tourapi",
       "name": "관광공사 행사·축제",
       "ok": true,
-      "count": 30,
+      "count": 29,
       "message": "정상 수집"
     },
     {
       "id": "kopis",
       "name": "KOPIS 공연",
-      "ok": true,
-      "count": 102,
-      "message": "정상 수집"
+      "ok": false,
+      "count": 0,
+      "message": "수집 실패 · 지난 자료 95건 유지 (HTTP 400 Bad Request · 400 Bad Request Request Blocked)"
     },
     {
       "id": "culture",
@@ -29,15 +29,15 @@
       "id": "tourapi",
       "name": "관광공사 행사·축제",
       "ok": true,
-      "count": 30,
+      "count": 29,
       "message": "정상 수집"
     },
     {
       "id": "kopis",
       "name": "KOPIS 공연",
-      "ok": true,
-      "count": 102,
-      "message": "정상 수집"
+      "ok": false,
+      "count": 0,
+      "message": "수집 실패 · 지난 자료 95건 유지 (HTTP 400 Bad Request · 400 Bad Request Request Blocked)"
     },
     {
       "id": "culture",
@@ -48,27 +48,84 @@
     }
   ],
   "counts": {
-    "total": 180,
-    "auto": 108,
+    "total": 179,
+    "auto": 107,
     "manual": 72
   },
   "manual_count": 76,
-  "events_count": 180,
+  "events_count": 179,
   "note": "직접 확인한 일정 우선 병합 · 출처별 실패 시 지난 자료 유지",
   "local": {
     "programs": {
       "name": "평생학습 강좌",
-      "ok": false,
-      "count": 0,
-      "fetched_at": null,
-      "message": "수집 실패 · 지난 자료 유지 (HTTP 400 Bad Request · { \"OpenAPI_ServiceResponse\": { \"cmmMsgHeader\": { \"errMsg\": \"NO_OPENAPI_SERVICE_ERROR\", \"returnAuthMsg\": \"해당 오픈API 서비스가 없거나 폐기됨\", \"returnReasonCode\": \"12\" } } })"
+      "ok": true,
+      "count": 322,
+      "fetched_at": "2026-10-09T12:05:08+09:00",
+      "fields": [
+        "edcColseTime",
+        "edcEndDay",
+        "edcMthType",
+        "edcPlace",
+        "edcRdnmadr",
+        "edcStartDay",
+        "edcStartTime",
+        "edcTrgetType",
+        "homepageUrl",
+        "instrctrNm",
+        "instt_nm",
+        "lctreCo",
+        "lctreCost",
+        "lctreNm",
+        "operDay",
+        "operInstitutionNm",
+        "operPhoneNumber",
+        "psncpa",
+        "rceptEndDate",
+        "rceptMthType",
+        "rceptStartDate",
+        "referenceDate",
+        "slctnMthType",
+        "제공기관코드",
+        "직업능력개발훈련비지원강좌여부",
+        "평생학습계좌제평가인정여부",
+        "학점은행제평가(학점)인정여부"
+      ]
     },
     "libraries": {
       "name": "도서관",
-      "ok": false,
-      "count": 0,
-      "fetched_at": null,
-      "message": "수집 실패 · 지난 자료 유지 (HTTP 403 Forbidden · { \"OpenAPI_ServiceResponse\": { \"cmmMsgHeader\": { \"errMsg\": \"SERVICE_KEY_IS_NOT_REGISTERED_ERROR\", \"returnAuthMsg\": \"등록되지 않은 서비스키\", \"returnReasonCode\": \"30\" } } })"
+      "ok": true,
+      "count": 484,
+      "fetched_at": "2026-10-09T12:05:08+09:00",
+      "fields": [
+        "bookCo",
+        "closeDay",
+        "ctprvnNm",
+        "holidayCloseOpenHhmm",
+        "holidayOperOpenHhmm",
+        "homepageUrl",
+        "latitude",
+        "lbrryNm",
+        "lbrrySe",
+        "longitude",
+        "phoneNumber",
+        "rdnmadr",
+        "referenceDate",
+        "satOperCloseHhmm",
+        "satOperOperOpenHhmm",
+        "seatCo",
+        "signguNm",
+        "weekdayOperColseHhmm",
+        "weekdayOperOpenHhmm",
+        "건물면적",
+        "대출가능권수",
+        "대출가능일수",
+        "부지면적",
+        "운영기관명",
+        "자료수(비도서)",
+        "자료수(연속간행물)",
+        "제공기관명",
+        "제공기관코드"
+      ]
     },
     "holidays": {
       "name": "공휴일",
@@ -79,7 +136,7 @@
     }
   },
   "place_fill": {
-    "checked_at": "2026-10-09T11:43:59+09:00",
+    "checked_at": "2026-10-09T12:05:10+09:00",
     "tourapi_calls": 0,
     "osm_lookups": 0,
     "unfinished": false,
