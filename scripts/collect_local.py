@@ -172,7 +172,9 @@ def collect_programs():
             continue
         r_start = u.ymd(pick(r, "rceptStartDate", "rceptBgnde"))
         r_end = u.ymd(pick(r, "rceptEndDate", "rceptEndde"))
-        key = u.norm_title(name + org + (start or ""))
+        # 같은 강좌가 '전라남도 …' / '전남광주통합특별시 …' 두 줄로 올라온 경우 하나로
+        addr_core = re.sub(r"^(전남광주통합특별시|전남광주특별시|광주광역시|전라남도)\s*", "", addr)
+        key = u.norm_title(name + (start or "") + re.sub(r"\([^)]*\)", "", addr_core) + pick(r, "edcStartTime"))
         if key in seen:
             continue
         seen.add(key)

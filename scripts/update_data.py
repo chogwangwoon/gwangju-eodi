@@ -11,7 +11,7 @@
 """
 
 from __future__ import annotations
-import os, json, re, time, urllib.error, urllib.parse, urllib.request
+import html, os, json, re, time, urllib.error, urllib.parse, urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -246,7 +246,7 @@ def clean_api_text(value):
     text = str(value)
     text = re.sub(r"<br\s*/?>", " / ", text, flags=re.IGNORECASE)
     text = re.sub(r"<[^>]+>", "", text)
-    text = text.replace("&nbsp;", " ")
+    text = html.unescape(text).replace("\xa0", " ")      # &middot; &#39; &amp; 등을 원래 글자로
     text = re.sub(r"\s+", " ", text)
 
     return text.strip()
@@ -403,7 +403,7 @@ def tourapi_festivals():
             break
 
         for x in items:
-            title = (x.get("title") or "").strip()
+            title = clean_api_text(x.get("title"))
             if not title:
                 continue
 
@@ -638,6 +638,8 @@ def culture_events():
                     continue
                 seq = r.get("seq") or r.get("id") or ""
                 title = clean_api_text(r.get("title"))
+                if re.search(r"(교육생|수강생|훈련생|참가자|단원|작가)\s*모집|취업|채용|양성과정|장기과정|사관학교|부트캠프", title):
+                    continue          # 취업·교육생 모집 공고는 동네 여가 정보가 아니라서 뺀다
                 if not seq or not title or seq in seen:
                     continue
                 seen.add(seq)
@@ -776,7 +778,7 @@ def kopis_performances():
     out = []
     for db in hits:
         get = lambda tag, d=db: (d.findtext(tag) or "").strip()
-        mid, title = get("mt20id"), get("prfnm")
+        mid, title = get("mt20id"), clean_api_text(get("prfnm"))
         if not mid or not title:
             continue
         start = ymd(get("prfpdfrom"))
@@ -885,6 +887,13 @@ def merge_events(manual, api_events):
         seen.add(k)
         merged.append(e)
 
+    # 출처끼리 겹치는 것 정리: 직접 입력 > KOPIS·관광공사 > 문화정보원 순으로 남김
+    pri = lambda e: 0 if e.get("origin") != "auto" else (2 if e.get("api") == "culture" else 1)
+    kept = []
+    for e in sorted(merged, key=pri):
+        if not any(same_event(e, k) for k in kept):
+            kept.append(e)
+    merged = kept
     merged.sort(key=lambda e: (e.get("start") or "9999-99-99", e.get("title") or ""))
     return merged
 
