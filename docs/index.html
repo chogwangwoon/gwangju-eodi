@@ -1142,6 +1142,24 @@ small,.gu,.kind,.tag{letter-spacing:0}
 
 /* 팝업이 열려 있을 땐 하단 메뉴가 팝업 버튼을 가리지 않게 */
 body.modal-open nav.bottom{display:none!important}
+
+/* 🏠 내 동네 · 🗓 이번 주말 */
+.homeBar{margin:8px 0 0}
+.homeBar .homeAsk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;background:#fff8ea;border:1px solid #f1dfb8;font-size:13px;color:#5b4a2a}
+.homeBar .homeAsk b{font-size:13.5px;color:#3d2f12}
+.homeBar select,.homeBar button{border:1px solid #e3cf9f;background:#fff;border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:700;color:#5b4a2a}
+.homeBar .homeOn{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#eef7f4;border:1px solid #cfe5dd;color:#134e4a;font-size:12.5px;font-weight:750}
+.homeBar .homeOn button{border:0;background:transparent;padding:0 0 0 4px;color:#3f8f7f;text-decoration:underline;font-weight:700}
+.homeKm{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:999px;background:#eef7f4;color:#134e4a;font-size:11.5px;font-weight:750;white-space:nowrap}
+.weekendPick{margin:18px 0}
+.weekendBox{background:var(--card);border:1px solid var(--line2);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+.weekendHead{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.weekendHead h2{margin:0;font-size:20px}.weekendHead small{display:block;color:var(--muted);font-size:12.5px;font-weight:600}
+.weekendList{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.weekendItem{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line2);background:#fffdf9;border-radius:14px;padding:10px 12px;cursor:pointer;width:100%}
+.weekendItem .wNo{flex:0 0 28px;height:28px;border-radius:50%;background:var(--gold-l);color:var(--gold-d);display:grid;place-items:center;font-weight:850}
+.weekendItem b{display:block;font-size:14.5px;line-height:1.35}.weekendItem small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.weekendItem .wTag{font-size:11px;font-weight:800;color:var(--green)}
 </style><title>PC · 오늘, 전남광주 어디로?</title>
 <style>
 .bakery .foodIcon{font-size:34px;display:flex;align-items:center;justify-content:center;min-width:72px;background:linear-gradient(145deg,#fff3d9,#f5dfb7);border-radius:16px}
@@ -1542,6 +1560,7 @@ button{min-height:var(--tap)}
 <div class="regionBar" id="regionBar" role="tablist" aria-label="권역 고르기"></div>
 <div class="topSearch"><label class="search"><span>⌕</span><input id="search2" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="뭐든 찾아보쇼잉 — 펭귄마을, 보리밥, 강아지"></label></div>
 </header>
+<div class="wrap"><div class="homeBar" id="homeBar"></div></div>
 
 <section class="hero" id="hero">
   <div class="sky" aria-hidden="true">
@@ -1666,6 +1685,8 @@ button{min-height:var(--tap)}
   </div>
 </section>
 
+<section class="weekendPick" id="weekendPick" aria-label="이번 주말 뭐 하지"></section>
+
 <section class="dailyBrief" id="dailyBrief">
   <div class="dailyBriefBox">
     <div class="dailyBriefHead">
@@ -1695,7 +1716,7 @@ button{min-height:var(--tap)}
   <div class="aiLeft">
     <div class="aiHead"><span>✨</span><div><b id="aiName">오늘어디로 길잡이</b><small id="aiSub">자동 수집된 최신 광주 정보에서 지금 가능한 선택지만 추려드려요.</small></div></div>
     <div class="aiInput"><input id="aiq" type="text" enterkeyhint="go" autocomplete="off" placeholder="예: 광주에서 무안 박물관 보고 떡갈비 먹고 싶어"><button id="ask">추천</button></div>
-    <div class="quick" id="quick"><button>비 오는 날 실내</button><button>산책하기 좋은 곳</button><button>축제 뭐 있어?</button><button>5·18 역사 걷기</button><button>무등산 등산하고 보리밥</button><button>강아지랑 카페</button><button>양림동 데이트</button><button>아이와 무료로</button><button>시장 구경하고 먹방</button><button>박물관 + 맛집</button><button>비엔날레 + 카페</button><button>🥐 빵지순례</button><button>떡갈비 먹고 영화</button><button>이번 주말 공연</button></div>
+    <div class="quick" id="quick"><button>비 오는 날 실내</button><button>산책하기 좋은 곳</button><button>축제 뭐 있어?</button><button class="ktx">🚄 KTX 당일치기</button><button class="ktx">🚄 KTX 1박 2일</button><button class="ktx">🚄 KTX 2박 3일</button><button>5·18 역사 걷기</button><button>무등산 등산하고 보리밥</button><button>강아지랑 카페</button><button>양림동 데이트</button><button>아이와 무료로</button><button>시장 구경하고 먹방</button><button>박물관 + 맛집</button><button>비엔날레 + 카페</button><button>🥐 빵지순례</button><button>떡갈비 먹고 영화</button><button>이번 주말 공연</button></div>
   </div>
   <div id="answer" class="answer"><div class="creamingState"><img class="js-creaming-src" alt="크리밍"><div><b>크리밍이 오늘 갈 곳을 골라드릴게요.</b><small>원하는 조건을 적어주세요. 오늘 실제 이용 가능한 일정과 장소부터 살펴볼게요.<br>예) "오늘 6시 이후 데이트", "비 오면 아이와 실내", "무료 전시 + 근처 저녁"</small></div></div></div>
 </div>
@@ -1753,7 +1774,7 @@ button{min-height:var(--tap)}
 document.documentElement.style.setProperty("--creaming", `url("${CREAMING_SRC}")`);
 document.querySelectorAll(".js-creaming-src").forEach(img=>{img.src=CREAMING_SRC;});
 /* 광주 LIFE MAP v3 — 일정(자동수집) · 미술관/박물관 · 광주맛집 · 지도 · 영화 · 카페 */
-let PROGRAMS = [], LIBS = [], ANNUAL = [], EVENTS = [], CAFES = [], CINEMAS = [], VENUES = [], FOOD = [], BAKERIES = [], STAYS = [], META = null;
+let FLAGS = {}, PROGRAMS = [], LIBS = [], ANNUAL = [], EVENTS = [], CAFES = [], CINEMAS = [], VENUES = [], FOOD = [], BAKERIES = [], STAYS = [], META = null;
 let FILTER = "전체", PLACE_KIND = "전체", FOOD_GU = "전체", MAP = null, MAP_LAYERS = {}, MAP_READY = false;
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d } catch { return d } },
@@ -2084,7 +2105,7 @@ function renderRegionBar() {
     ys: ["순천·여수·광양 · 남해안 오늘의 순천여수권", "<b>정원과 바다, 전시·공연·축제를 한 번에.</b> 순천의 정원·원도심부터 여수의 바다·야경, 광양·보성·구례까지 오늘 움직이기 좋은 코스로 골라드려요."],
     mp: ["목포·무안·신안 · 서남해 오늘의 무안목포권", "<b>목포 원도심과 서남해 바다, 오늘 즐길 곳을 한눈에.</b> 목포·무안·신안부터 해남·진도·완도까지 시간과 이동 조건에 맞춰 무리 없는 코스로 골라드려요."]
   };
-  const CUR = { gj: ["광주 토박이 길잡이", "예: 비 오는 날 아이와 실내 / 퇴근하고 저녁 산책", "원하는 하루를 말해보쇼. 같은 동네로 묶어서 코스 짜드릴랑께요."],
+  const CUR = { gj: ["광주 토박이 길잡이", "예: 비 오는 날 아이와 실내 / 퇴근하고 저녁 산책 / KTX 1박 2일", "원하는 하루를 말해보쇼. 같은 동네로 묶어서 코스 짜드릴랑께요."],
     ys: ["순천여수 토박이 길잡이", "예: 비 오는 날 실내 / 여수 박물관 + 맛집 / 순천 산책", "순천·여수·광양·보성·구례·곡성·고흥, 같은 동네로 묶어서 골라드릴랑께요."],
     mp: ["무안목포 토박이 길잡이", "예: 아이와 박물관 / 목포 산책 / 해남 땅끝", "목포·무안·신안·해남·강진·진도·완도…, 가까운 데끼리 묶어서 골라드릴랑께요."] }[REGION];
   const an = document.getElementById("aiName"), as = document.getElementById("aiSub"), aq = document.getElementById("aiq");
@@ -2098,8 +2119,8 @@ function renderRegionBar() {
 }
 function renderAll() {
   $("#eventNum").textContent = EVENTS.length; $("#placeNum").textContent = VENUES.length; $("#foodNum").textContent = FOOD.length; $("#cafeNum").textContent = CAFES.length;
-  renderRegionBar(); renderQuick();
-  renderMeta(); renderNowStart(); renderNowShow(); renderToday(); renderEvents(); renderPlaces(); renderStages(); renderPopShows(); renderDailyBrief(); renderDeadlineRush(); renderDecisionWeather(); renderVenueTab("galleries"); renderVenueTab("museums"); renderFood(); renderBakeries(); renderMarkets(); renderStays(); renderCinemas(); renderCafes(); renderLocal(); renderFavs(); renderGallery();
+  renderRegionBar(); renderHomeBar(); renderQuick();
+  renderMeta(); renderNowStart(); renderNowShow(); renderToday(); renderEvents(); renderPlaces(); renderStages(); renderPopShows(); renderDailyBrief(); renderDeadlineRush(); renderDecisionWeather(); renderVenueTab("galleries"); renderVenueTab("museums"); renderFood(); renderBakeries(); renderMarkets(); renderStays(); renderCinemas(); renderCafes(); renderLocal(); renderWeekend(); renderFavs(); renderGallery();
 }
 window.setRegion = r => {
   if (!REGIONS[r] || r === REGION) return;
@@ -2130,11 +2151,12 @@ async function load() {
   const pinnedIds = new Set(["island-visit-year-2026", "ys-island-expo-2026"]);
   const embeddedPinned = (window.__DATA__?.events || []).filter(e => pinnedIds.has(e.id));
   E0 = [...(E0 || []).filter(e => !pinnedIds.has(e.id)), ...embeddedPinned];
-  // 현지인 여가용 앱: 숙소는 화면·추천·검색에서 쓰지 않는다 (데이터 파일은 그대로 둠)
-  S0 = [];
+  // 숙소: 메뉴엔 없음. 'KTX 1박 2일'·'숙소' 같은 요청에서만 코스에 들어감
   // 동네 강좌·도서관 (없으면 빈 목록 — 자동 수집이 처음 돈 뒤부터 채워짐)
   const [P0, L0] = await Promise.all([getJSON("programs"), getJSON("libraries")]);
   ALL.PROGRAMS = Array.isArray(P0) ? P0 : []; ALL.LIBS = Array.isArray(L0) ? L0 : [];
+  // '정보 수정' 제보가 열려 있는 항목 (자동 수집이 GitHub 이슈에서 읽어 옴)
+  try { const F0 = await getJSON("flags", null); if (F0 && typeof F0 === "object" && !Array.isArray(F0)) FLAGS = F0 } catch { }
   // 공식 공휴일 목록(자동 수집)이 있으면 기본값에 더한다
   try { const H0 = await getJSON("holidays", null); if (H0 && typeof H0 === "object" && !Array.isArray(H0)) Object.assign(HOLIDAYS, H0) } catch { }
   META = META0; Object.assign(ALL, { EVENTS: E0, CAFES: C0, CINEMAS: M0, VENUES: V0, FOOD: F0, BAKERIES: B0, STAYS: S0 });
@@ -3078,7 +3100,9 @@ function renderNowStart(refresh=false) {
     .map(x=>({kind:'event',x,window:nowTimeWindow(x,true,n)})).filter(p=>p.window.ok);
   const vv=VENUES.filter(v=>openToday(v)!==false)
     .map(x=>({kind:'venue',x,window:nowTimeWindow(x,false,n)})).filter(p=>p.window.ok);
-  const candidates=[...ev,...vv].sort((a,b)=>a.window.rank-b.window.rank || (a.kind===b.kind?0:a.kind==='venue'?-1:1));
+  let candidates=[...ev,...vv].sort((a,b)=>a.window.rank-b.window.rank || (HOME?((homeKm(a.x)??99)-(homeKm(b.x)??99)):0) || (a.kind===b.kind?0:a.kind==='venue'?-1:1));
+  // 내 동네가 정해져 있으면 12km 안 후보부터 (3개 이상일 때)
+  if(HOME){const near=candidates.filter(p=>(homeKm(p.x)??99)<=12); if(near.length>=3) candidates=near}
   // 동일 항목 및 같은 장소 중복 추천 방지
   const unique=[], used=new Set();
   for(const p of candidates){const key=(p.x.venue||p.x.name||p.x.title||'').trim();if(used.has(key))continue;used.add(key);unique.push(p)}
@@ -3087,7 +3111,7 @@ function renderNowStart(refresh=false) {
   if(!picks.length){grid.innerHTML=`<div class="nowPick"><b>${period} 시간대에 확인된 후보가 부족해요.</b><small>운영시간이 불명확한 곳은 무리하게 추천하지 않았어요. 가볼 곳·지도를 확인해 주세요.</small></div>`; if(note)note.textContent=`${RNAME()} · 현재 ${period} · 이용 가능 시간 확인된 장소 없음`;return}
   const tag=p=>p.kind==='event'?(p.x.category||'오늘 일정'):(p.x.kind||'가볼 곳');
   const name=p=>p.kind==='event'?p.x.title:p.x.name;
-  const meta=p=>`${p.window.label} · ${p.kind==='event'?(p.x.venue||''):(p.x.district||'')} · ${p.kind==='event'?(p.x.time||''):(p.x.hours||'')}`;
+  const meta=p=>{const d=homeKm(p.x);return `${p.window.label} · ${p.kind==='event'?(p.x.venue||''):(p.x.district||'')}${d!=null?` · 🏠 ${d<0.95?Math.max(100,Math.round(d*10)*100)+'m':d.toFixed(1)+'km'}`:''} · ${p.kind==='event'?(p.x.time||''):(p.x.hours||'')}`};
   const click=p=>p.kind==='event'?`detail('${esc(p.x.id)}')`:`aiProfile('${esc(p.x.id)}')`;
   grid.innerHTML=picks.map((p,i)=>`<button class="nowPick" type="button" onclick="${click(p)}"><div class="nowPickTop"><span class="nowPickNo">${i+1}</span><span class="nowPickTag">${esc(tag(p))}</span></div><b>${esc(name(p))}</b><small>${esc(meta(p))}</small></button>`).join('');
   if(note)note.textContent=`${RNAME()} · ${period}에 도착해 이용할 수 있는 시간대 우선 · 이동시간·임시휴무는 방문 전 확인`;
@@ -3108,7 +3132,7 @@ function eventCard(x) {
   if (vimg) x = { ...x, image: vimg };
   const bg = x.image && /^https?:/.test(x.image) ? ` style="background-image:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.35)),url('${esc(x.image.replace(/^http:/, "https:"))}')"` : "";
   return `<article class="card"><div class="visual${bg ? " photo" : " art-" + esc(x.category)}"${bg} role="button" tabindex="0" onclick="detail('${esc(x.id)}')">${bg ? "" : `<span class="evIcon">${({ "전시": "🖼", "음악": "🎵", "공연": "🎭", "축제": "🎪", "스포츠": "🏟" })[x.category] || "✦"}</span>`}<div class="topTags"><span class="tag">${esc(x.category)} · ${esc(x.subtype)}</span><span class="tag status">${esc(x.status)}</span></div><div class="date"><small>DATE</small><strong>${esc(x.date)}</strong></div>${(() => { const n = daysLeft(x), st = !x.start || x.start <= todayISO(); if (!st && x.start) { const k = Math.round((new Date(x.start + "T00:00:00+09:00") - new Date(todayISO() + "T00:00:00+09:00")) / 864e5); return `<span class="dleft calm">${k === 1 ? "내일 시작" : k + "일 뒤 시작"}</span>` } return n == null ? "" : n === 0 ? `<span class="dleft">오늘 마지막 날</span>` : n <= 14 ? `<span class="dleft">D-${n}</span>` : "" })()}</div>
-  <div class="body"><div class="title">${esc(x.title)}</div><div class="venue">${esc(x.venue)}${x.district ? " · " + esc(x.district) : ""}</div>
+  <div class="body"><div class="title">${esc(x.title)}</div><div class="venue">${esc(x.venue)}${x.district ? " · " + esc(x.district) : ""}${homeTag(x)}${flagTag(x)}</div>
   <ul class="facts">
    ${x.time ? `<li><i>🕘</i><span>${esc(x.time)}</span></li>` : ""}
    ${x.price ? `<li><i>💳</i><span>${esc(x.price)}</span></li>` : ""}
@@ -3207,7 +3231,7 @@ function hereBox(v) {
 function placeCard(v) {
   const trail = v.kind === "무등산 트레킹";
   const rows = (trail ? [["코스", v.hours], ["출발", v.parking.replace("출발: ", "")], ["확인", v.closed], ["요금", v.price]] : [["시간", v.hours], ["휴관", v.closed], ["요금", v.price], ["아이", v.kids]]).filter(r => r[1]);
-  return `<div class="listCard place withCover"><div class="coverBtn" role="button" tabindex="0" onclick="aiProfile('${esc(v.id)}')">${cover(v, v.kind)}</div><div class="listMain"><div class="kindRow"><span class="kind k-${esc(v.kind)}">${esc(v.kind)}</span><span class="gu">${esc(v.district)}</span>${v.inout ? `<span class="io ${v.inout === "야외" ? "out" : ""}">${v.inout === "야외" ? "🌤 야외" : v.inout === "실내" ? "🏠 실내" : "🏠🌤 실내·야외"}</span>` : ""}</div><b>${esc(v.name)}</b>
+  return `<div class="listCard place withCover"><div class="coverBtn" role="button" tabindex="0" onclick="aiProfile('${esc(v.id)}')">${cover(v, v.kind)}</div><div class="listMain"><div class="kindRow">${flagTag(v)}${homeTag(v)}<span class="kind k-${esc(v.kind)}">${esc(v.kind)}</span><span class="gu">${esc(v.district)}</span>${v.inout ? `<span class="io ${v.inout === "야외" ? "out" : ""}">${v.inout === "야외" ? "🌤 야외" : v.inout === "실내" ? "🏠 실내" : "🏠🌤 실내·야외"}</span>` : ""}</div><b>${esc(v.name)}</b>
   ${v.note || v.desc ? `<small class="note">${esc(v.note || v.desc)}</small>` : ""}${v.updated ? `<small class="upd">↻ ${esc(v.updated.slice(5).replace("-", "."))} 관광공사 정보로 갱신</small>` : ""}
   <dl>${rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>
   ${visitLine(v)}${parkLine(v)}${hereBox(v)}
@@ -3242,7 +3266,7 @@ function placeFilter(v) {
   return g(v) && io && gu && open;
 }
 function renderPlaces() {
-  const list = VENUES.filter(placeFilter);
+  const list = sortHome(VENUES.filter(placeFilter));
   const cnt = g => VENUES.filter(PLACE_GROUPS.find(x => x[0] === g)[2]).length;
   const d = DAY_KO[kstNow().getUTCDay()];
   $("#placesView").innerHTML = `<div class="sectionHead"><div><span class="eyebrow">PLACES · ${esc(RNAME())}</span><h2>어디 가볼랑가?<small>${REGION === "gj" ? "미술관·박물관·양림동·무등산부터 담양·나주·장성 근교까지" : REGION === "ys" ? "순천만·낙안읍성·여수 바다·녹차밭·매화마을·박물관까지" : "목포 근대길·자연사박물관·땅끝·대흥사·청자박물관까지"}</small></h2></div><span>${list.length}곳</span></div>
@@ -3517,14 +3541,14 @@ function checkPopNotifications(force=false){
 /* ───────── 맛집 ───────── */
 function foodCard(r) {
   const official = r.badge === "2025 광주맛집";
-  return `<div class="listCard food"><div class="foodIcon">${foodIcon(r)}</div><div class="listMain"><div class="kindRow"><span class="kind ${official ? "k-gm" : ""}">${esc(r.badge)}</span><span class="gu">${esc(r.district)}</span>${r.menu ? `<span class="menu">${esc(r.menu)}</span>` : ""}</div><b>${esc(r.name)}</b>
+  return `<div class="listCard food"><div class="foodIcon">${foodIcon(r)}</div><div class="listMain"><div class="kindRow">${flagTag(r)}${homeTag(r)}<span class="kind ${official ? "k-gm" : ""}">${esc(r.badge)}</span><span class="gu">${esc(r.district)}</span>${r.menu ? `<span class="menu">${esc(r.menu)}</span>` : ""}</div><b>${esc(r.name)}</b>
   <small>${esc(r.address)}</small>${r.note ? `<small class="note">${esc(r.note)}</small>` : ""}${r.hours ? `<small class="goLine ok">🕘 ${esc(r.hours)}${r.brk ? ` · 브레이크 ${esc(r.brk)}` : ""} · 쉬는 날 ${esc(r.closed || "확인 필요")}${r.hoursSrc ? ` <i style="font-style:normal;opacity:.7">✓ ${esc(r.hoursSrc)} 확인</i>` : ""}</small>` : `<small class="goLine">🕘 영업시간·쉬는 날·브레이크타임은 자주 바뀌어요 — 가기 전에 '메뉴·영업시간'에서 확인하쇼</small>`}${parkLine(r)}
   <div class="btnRow"><button class="miniBtn" onclick="showOnMap('food','${esc(r.id)}')">앱 지도에서 ◉</button><a class="miniBtn" target="_blank" rel="noopener" href="${mapLink(r.name + " " + r.district)}">메뉴·영업시간 ↗</a>${favBtn("f:" + r.id)}${shareBtn("f", r.id)}${reportBtn("f", r.id)}</div></div></div>`;
 }
 function renderFood() {
   const gus = DIST_OPTS().filter(g => g === "전체" || FOOD.some(f => f.district === g));
   const q = "";
-  const list = FOOD.filter(r => (FOOD_GU === "전체" || r.district === FOOD_GU) && [r.name, r.menu, r.district, r.address, r.note, r.badge].join(" ").toLowerCase().includes(q));
+  const list = sortHome(FOOD.filter(r => (FOOD_GU === "전체" || r.district === FOOD_GU) && [r.name, r.menu, r.district, r.address, r.note, r.badge].join(" ").toLowerCase().includes(q)));
   $("#foodView").innerHTML = `<div class="sectionHead"><div><span class="eyebrow">TASTE · ${esc(RNAME())}</span><h2>징하게 맛있는 ${RW()}<small>${REGION === "gj" ? "광주 7미부터 광주시 선정 맛집까지" : "관광공사에 등록된 노포·향토 음식점"}</small></h2></div><span>${list.length}곳</span></div>
   ${REGION === "gj" ? `<div class="mi7Head"><b>광주 7미(味)</b><span>광주 오면 이건 먹고 가야제 — 누르면 맛집이 나와요</span></div>
   <div class="mi7">${MI7.map(([e, n, d, q]) => `<button onclick="mi7('${q}')"><em>${e}</em><b>${n}</b><small>${d}</small></button>`).join("")}</div>` : `<div class="nowEmpty">🍲 ${esc(RNAME())} 맛집은 아직 모으는 중이에요. 그동안은 <a class="btn" target="_blank" rel="noopener" href="${mapLink(REGIONS[REGION].hub + " 맛집")}">${esc(REGIONS[REGION].hub)} 맛집 지도에서 보기 ↗</a></div>`}
@@ -3713,7 +3737,7 @@ function renderStays() { if (regionEmpty("staysView", "🛏", "숙소", { staysV
 /* ───────── 영화·카페 ───────── */
 function renderCinemas() { if (regionEmpty("cinemasView", "🎬", "영화관", { staysView: STAYS, cinemasView: CINEMAS, cafesView: CAFES, marketsView: VENUES.filter(v => v.market) }["cinemasView"])) return; $("#cinemasView").innerHTML = `<div class="sectionHead"><div><span class="eyebrow">MOVIE</span><h2>영화 한 편 볼랑가<small>극장별 실시간 상영표로 바로 연결</small></h2></div><span>${CINEMAS.length}곳</span></div><div class="grid">${CINEMAS.map(c => `<div class="listCard"><div class="listMain"><b>${esc(c.name)}</b><small>${esc(c.district)} · ${esc(c.address)}<br>☎ ${esc(c.phone)}</small>${c.rating ? `<div class="rating">★ ${esc(c.rating)} · 리뷰 ${esc(c.reviews)}</div>` : `<div class="rating">🎞 독립·예술영화 · 손간판 극장</div>`}${parkLine(c)}<div class="btnRow"><a class="miniBtn" target="_blank" rel="noopener" href="${safeUrl(c.url)}">${c.rating ? "실시간 상영시간" : "상영 시간표"} ↗</a><a class="miniBtn" target="_blank" rel="noopener" href="${mapLink(c.name)}">지도 ↗</a></div></div></div>`).join("")}</div><div class="verify" style="margin-top:12px">영화 상영시간은 매우 자주 바뀌므로 앱에 저장하지 않고 각 영화관 공식 예매처로 연결합니다.</div>` }
 function petCard(c) {
-  return `<div class="listCard pet"><div class="petTop">${c.big ? "🐕" : "🐶"}<small>${c.big ? "넓은 마당·야외" : esc(c.near || c.district)}</small></div><div class="listMain"><div class="kindRow"><span class="kind">반려견 동반</span><span class="gu">${esc(c.district)}${c.near ? " · " + esc(c.near) : ""}</span>${c.big ? `<span class="io out">🌳 야외 공간</span>` : ""}</div><b>${esc(c.name)}</b>
+  return `<div class="listCard pet"><div class="petTop">${c.big ? "🐕" : "🐶"}<small>${c.big ? "넓은 마당·야외" : esc(c.near || c.district)}</small></div><div class="listMain"><div class="kindRow">${flagTag(c)}${homeTag(c)}<span class="kind">반려견 동반</span><span class="gu">${esc(c.district)}${c.near ? " · " + esc(c.near) : ""}</span>${c.big ? `<span class="io out">🌳 야외 공간</span>` : ""}</div><b>${esc(c.name)}</b>
   <div class="petRule"><b>🐾 동반 규칙</b> ${esc(c.pet)}</div>${c.note ? `<small class="note">${esc(c.note)}</small>` : ""}
   <dl><dt>시간</dt><dd>${esc(c.hours)}</dd><dt>주소</dt><dd>${esc(c.address)}</dd>${c.phone ? `<dt>전화</dt><dd>${esc(c.phone)}</dd>` : ""}</dl>${parkLine(c)}
   <div class="btnRow"><button class="miniBtn" onclick="showOnMap('cafe','${esc(c.id)}')">앱 지도에서 ◉</button><a class="miniBtn" target="_blank" rel="noopener" href="${mapLink(c.name + " " + c.district)}">최신 정보 ↗</a>${favBtn("c:" + c.id)}${shareBtn("c", c.id)}${reportBtn("c", c.id)}</div></div></div>`;
@@ -3721,7 +3745,7 @@ function petCard(c) {
 let CAFE_GU = "전체";
 window.setCafeGu = g => { CAFE_GU = g; renderCafes() };
 function renderCafes() { if (regionEmpty("cafesView", "🐶", "반려견 동반 카페", { staysView: STAYS, cinemasView: CINEMAS, cafesView: CAFES, marketsView: VENUES.filter(v => v.market) }["cafesView"])) return;
-  const list = CAFES.filter(c => CAFE_GU === "전체" || (CAFE_GU === "야외" ? c.big : c.district === CAFE_GU));
+  const list = sortHome(CAFES.filter(c => CAFE_GU === "전체" || (CAFE_GU === "야외" ? c.big : c.district === CAFE_GU)));
   $("#cafesView").innerHTML = `<div class="sectionHead"><div><span class="eyebrow">WITH MY DOG</span><h2>멍뭉이랑 같이 가는 카페<small>${RW()} 반려견 동반 카페 ${CAFES.length}곳</small></h2></div><span>${list.length}곳</span></div>
   <div class="petTips"><div><b>🦮 리드줄·하네스</b>대부분 필수예요. 매너벨트(기저귀)를 챙기면 실내 동반되는 곳이 많아요.</div><div><b>🐕 대형견이면</b>'넓은 마당·야외' 표시된 곳이 편해요. 크기 제한은 꼭 전화로 확인!</div><div><b>📞 가기 전에</b>동반 규칙·영업시간이 자주 바뀌어요. '최신 정보'로 한 번 더 확인하쇼.</div></div>
   <div class="subchips">${["전체", "야외", ...DIST_OPTS().slice(1).filter(g => CAFES.some(c => c.district === g))].map(g => `<button class="${g === CAFE_GU ? "active" : ""}" onclick="setCafeGu('${g}')">${g === "야외" ? "🌳 넓은 야외" : g}</button>`).join("")}</div>
@@ -3731,7 +3755,7 @@ function renderCafes() { if (regionEmpty("cafesView", "🐶", "반려견 동반 
 
 /* ───────── 🏘 동네: 오늘 문 연 도서관 · 접수 중인 강좌 · 이번 주 체험 ─────────
    관광이 아니라 '사는 동네에서 남는 시간 쓰기'용. 자료는 공공데이터 표준데이터(주 1회 자동 갱신). */
-let LOCAL_F = "전체", LOCAL_GU = "전체";
+let LOCAL_F = "전체", LOCAL_GU = (store.get("glm_home", null) || {}).gu || "전체";
 window.setLocalF = f => { LOCAL_F = f; renderLocal() };
 window.setLocalGu = g => { LOCAL_GU = g; renderLocal() };
 function libToday(l, iso = todayISO()) {
@@ -3753,7 +3777,7 @@ function libCard(l) {
     : t.done ? `<span class="kind" style="background:#eee;color:#666">오늘 운영 끝 (${esc(t.hours)})</span>`
     : t.later ? `<span class="kind k-gm">${esc(t.hours.split("~")[0])} 개관</span>`
     : t.open ? `<span class="kind k-gm">지금 열림 · ~${esc(t.hours.split("~")[1])}</span>` : `<span class="kind">${esc(t.why)}</span>`;
-  return `<div class="listCard"><div class="listMain"><div class="kindRow">${badge}<span class="gu">${esc(l.district)}</span>${l.type ? `<span class="menu">${esc(l.type)}</span>` : ""}</div><b>📚 ${esc(l.name)}</b>
+  return `<div class="listCard"><div class="listMain"><div class="kindRow">${flagTag(l)}${homeTag(l)}${badge}<span class="gu">${esc(l.district)}</span>${l.type ? `<span class="menu">${esc(l.type)}</span>` : ""}</div><b>📚 ${esc(l.name)}</b>
   <small>${esc(l.address)}</small>
   <small class="note">평일 ${esc(l.weekday || "-")} · 토 ${esc(l.saturday || "-")} · 일·공휴일 ${esc(l.holiday || "-")}${l.closed ? ` · 휴관 ${esc(l.closed)}` : ""}</small>
   <div class="btnRow"><a class="miniBtn" target="_blank" rel="noopener" href="${mapLink(l.name)}">지도 ↗</a>${l.url ? `<a class="miniBtn" target="_blank" rel="noopener" href="${esc(/^https?:/.test(l.url) ? l.url : "http://" + l.url)}">도서관 누리집 ↗</a>` : ""}${l.phone ? `<a class="miniBtn" href="tel:${esc(l.phone)}">☎ ${esc(l.phone)}</a>` : ""}</div></div></div>`;
@@ -3766,7 +3790,7 @@ function progState(p, t = todayISO()) {
 }
 function progCard(p) {
   const [st, sub] = progState(p);
-  return `<div class="listCard"><div class="listMain"><div class="kindRow"><span class="kind ${st === "접수 중" ? "k-gm" : ""}">${st}</span><span class="gu">${esc(p.district)}</span><span class="menu">${esc(p.fee || "수강료 확인")}</span></div><b>${esc(p.name)}</b>
+  return `<div class="listCard"><div class="listMain"><div class="kindRow">${flagTag(p)}${homeTag(p)}<span class="kind ${st === "접수 중" ? "k-gm" : ""}">${st}</span><span class="gu">${esc(p.district)}</span><span class="menu">${esc(p.fee || "수강료 확인")}</span></div><b>${esc(p.name)}</b>
   <small>${esc([p.org, p.place].filter(Boolean).join(" · "))}</small>
   <small class="note">${esc([sub, p.days, p.time, p.target].filter(Boolean).join(" · "))}</small>
   ${p.applyHow ? `<small>신청: ${esc(p.applyHow)}${p.select ? ` · ${esc(p.select)}` : ""}</small>` : ""}
@@ -3776,7 +3800,7 @@ function renderLocal() {
   const el = document.getElementById("localView"); if (!el) return;
   const t = todayISO(), wk = isoPlus(7);
   const gu = x => LOCAL_GU === "전체" || x.district === LOCAL_GU;
-  const libs = LIBS.filter(gu).map(l => [l, libToday(l)]).sort((a, b) => (b[1].open === true && !b[1].done) - (a[1].open === true && !a[1].done) || (a[0].name > b[0].name ? 1 : -1));
+  const libs = sortHome(LIBS.filter(gu)).map(l => [l, libToday(l)]).sort((a, b) => (b[1].open === true && !b[1].done) - (a[1].open === true && !a[1].done));
   const openLibs = libs.filter(([, s]) => s.open !== false && !s.done);
   const evening = p => /^(1[89]|2\d):/.test(p.time || "");
   const weekend = p => /토|일|주말/.test(p.days || "");
@@ -3785,7 +3809,7 @@ function renderLocal() {
   if (LOCAL_F === "무료") progs = progs.filter(p => p.free);
   if (LOCAL_F === "저녁") progs = progs.filter(evening);
   if (LOCAL_F === "주말") progs = progs.filter(weekend);
-  progs.sort((a, b) => progState(a)[2] - progState(b)[2] || (a.free === b.free ? 0 : a.free ? -1 : 1));
+  progs = sortHome(progs); progs.sort((a, b) => progState(a)[2] - progState(b)[2] || (a.free === b.free ? 0 : a.free ? -1 : 1));
   const exp = EVENTS.filter(e => (e.subtype === "교육·체험" || (e.tags || []).includes("체험")) && (!e.end || e.end >= t) && (!e.start || e.start <= wk)).filter(gu);
   const dists = DIST_OPTS().slice(1).filter(g => LIBS.some(l => l.district === g) || PROGRAMS.some(p => p.district === g));
   const nothing = !LIBS.length && !PROGRAMS.length;
@@ -4721,6 +4745,7 @@ function detailView(id) {
   $("#modalContent").innerHTML =
     `<span class="eyebrow">${esc(x.category)} · ${esc(x.subtype)} · ${originLabel}</span>` +
     `<h3>${esc(x.title)}</h3>` +
+    `${FLAGS[x.id] ? `<p class="nowNote">⚠ ${esc(FLAGS[x.id].since.slice(5).replace("-", "."))}부터 '정보가 다르다'는 제보가 있어 확인 중이에요. 가기 전에 공식 원문을 꼭 확인하세요.</p>` : ""}` +
     `<p style="font-size:11px;color:#6d766f">${placeLine}</p>` +
     `${ticketHtml}${trustStrip(x)}` +
     `${(x.ticket?.links || []).length > 1 ? `<p class="links">${x.ticket.links.map(l => `<a class="btn" target="_blank" rel="noopener" href="${safeUrl(l.url)}">${esc(l.name)} ↗</a>`).join(" ")}</p>` : ""}` +
@@ -4800,6 +4825,138 @@ function calButtons(x) {
   return `<p class="btnRow" style="margin-top:4px"><button class="miniBtn" type="button" onclick="addToCalendar('${esc(x.id)}')">📅 내 캘린더에 추가 <small style="opacity:.7">(${esc(what)})</small></button><a class="miniBtn" target="_blank" rel="noopener" href="${esc(googleCalUrl(x))}">Google 캘린더</a></p>`;
 }
 
+
+/* ───────── 🏠 내 동네: 사는 구를 고르면(또는 지금 위치) 가까운 곳부터 ───────── */
+let HOME = store.get("glm_home", null);
+function coordAny(x) {
+  if (!x) return null;
+  const c = coordOf(x); if (c) return c;
+  const v = x.venueId && (ALL.VENUES.find(v => v.id === x.venueId)); return v ? coordOf(v) : null;
+}
+function guCenter(gu) {
+  const pts = [...ALL.VENUES, ...(ALL.FOOD || []), ...(ALL.LIBS || [])].filter(x => x.district === gu).map(coordAny).filter(Boolean);
+  if (!pts.length) return null;
+  return { lat: pts.reduce((a, c) => a + c.lat, 0) / pts.length, lng: pts.reduce((a, c) => a + c.lng, 0) / pts.length };
+}
+function homeKm(x) {
+  if (!HOME || HOME.lat == null) return null;
+  const c = coordAny(x); if (!c) return null;
+  return km({ lat: HOME.lat, lng: HOME.lng }, c);
+}
+function flagTag(x) {
+  const f = x && x.id && FLAGS[x.id]; if (!f) return "";
+  return `<span class="homeKm" style="background:#fff1d6;color:#9a5a08" title="${esc(f.since)}부터 제보 ${f.count}건 · 확인 중">⚠ 제보 확인 중</span>`;
+}
+function homeTag(x) {
+  const d = homeKm(x); if (d == null) return "";
+  return `<span class="homeKm" title="${esc(HOME.gu || "내 위치")}에서">🏠 ${d < 0.95 ? Math.max(100, Math.round(d * 10) * 100) + "m" : d.toFixed(d < 10 ? 1 : 0) + "km"}</span>`;
+}
+/* 가까운 순 (좌표 없는 곳은 같은 구면 앞쪽, 나머지는 원래 순서대로 뒤) */
+function sortHome(list) {
+  if (!HOME) return list;
+  const key = x => { const d = homeKm(x); return d != null ? d : x.district && x.district === HOME.gu ? 3 : 999 };
+  return list.map((x, i) => [x, key(x), i]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(a => a[0]);
+}
+function allDistricts() { return Object.entries(REGIONS).flatMap(([r, R]) => R.districts.map(d => [r, d])) }
+function regionOfGu(gu) { const hit = allDistricts().find(([, d]) => d === gu); return hit ? hit[0] : REGION }
+window.setHome = gu => {
+  if (!gu) return;
+  const c = guCenter(gu);
+  HOME = { gu, lat: c ? c.lat : null, lng: c ? c.lng : null, src: "gu" };
+  store.set("glm_home", HOME);
+  const r = regionOfGu(gu);
+  if (typeof LOCAL_GU !== "undefined") LOCAL_GU = gu;
+  if (r !== REGION) setRegion(r); else { applyRegion(); renderAll() }
+  toast(`🏠 ${gu} 기준으로 가까운 곳부터 보여드려요`);
+};
+window.useMyLocation = () => {
+  if (!navigator.geolocation) { toast("이 기기에선 위치를 쓸 수 없어요. 동네를 골라 주세요."); return }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const me = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    // 가장 가까운 장소의 구를 내 동네로
+    let best = null; for (const v of ALL.VENUES) { const c = coordOf(v); if (!c || !v.district) continue; const d = km(me, c); if (best == null || d < best[0]) best = [d, v.district] }
+    HOME = { gu: best ? best[1] : "내 위치", lat: me.lat, lng: me.lng, src: "gps" };
+    store.set("glm_home", HOME);
+    const r = regionOfGu(HOME.gu);
+    if (r !== REGION) setRegion(r); else { applyRegion(); renderAll() }
+    toast(`📍 지금 위치(${HOME.gu}) 기준으로 가까운 곳부터 보여드려요`);
+  }, () => toast("위치 권한이 없어서 동네로 골라 주세요."), { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
+};
+window.clearHome = () => { HOME = null; store.set("glm_home", null); renderAll() };
+window.skipHome = () => { store.set("glm_home_skip", 1); renderHomeBar() };
+window.editHome = () => { HOME_EDIT = true; renderHomeBar() };
+let HOME_EDIT = false;
+function renderHomeBar() {
+  const el = document.getElementById("homeBar"); if (!el) return;
+  if (HOME && !HOME_EDIT) {
+    el.innerHTML = `<span class="homeOn">${HOME.src === "gps" ? "📍" : "🏠"} ${esc(HOME.gu)} 기준 · 가까운 순<button type="button" onclick="editHome()">바꾸기</button></span>`;
+    return;
+  }
+  if (!HOME && store.get("glm_home_skip", 0) && !HOME_EDIT) { el.innerHTML = `<span class="homeOn">🏠 <button type="button" onclick="editHome()" style="text-decoration:none;padding:0">사는 동네 고르기</button></span>`; return }
+  const opts = Object.entries(REGIONS).map(([r, R]) => `<optgroup label="${esc(R.name)}">${R.districts.map(d => `<option value="${d}" ${HOME && HOME.gu === d ? "selected" : ""}>${d}</option>`).join("")}</optgroup>`).join("");
+  el.innerHTML = `<div class="homeAsk"><b>🏠 사는 동네를 고르면</b> 가까운 곳부터 보여드려요
+    <select aria-label="사는 동네" onchange="HOME_EDIT=false;setHome(this.value)"><option value="">동네 고르기</option>${opts}</select>
+    <button type="button" onclick="HOME_EDIT=false;useMyLocation()">📍 지금 위치로</button>
+    ${HOME ? `<button type="button" onclick="HOME_EDIT=false;clearHome()">기준 끄기</button>` : `<button type="button" onclick="skipHome()">나중에</button>`}</div>`;
+}
+
+/* ───────── 🗓 이번 주말 뭐 하지: 주말마다 자동으로 바뀌는 5선 ───────── */
+function weekendDays() {
+  const t = todayISO(), dow = isoDow(t);
+  if (dow === 6) return [t, isoPlus(1)];
+  if (dow === 0) return [t];
+  const sat = isoPlus(6 - dow); const d = new Date(sat + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + 1);
+  return [sat, d.toISOString().slice(0, 10)];
+}
+function seeded(str) { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) } return (h >>> 0) / 4294967296 }
+function weekendPicks() {
+  const days = weekendDays(), wk = days[0];
+  const onWeekend = e => days.some(d => happensOn(e, d)) && !["매진", "종료"].includes(ticketOf(e).status);
+  const ev = EVENTS.filter(onWeekend);
+  const isFree = x => /무료/.test((x.price || "") + (x.discount || "") + (x.tags || []).join(" "));
+  const endsSoon = x => x.end && x.end <= isoPlus(9);
+  const score = x => {
+    const d = homeKm(x);
+    return (d == null ? 6 : Math.min(d, 25)) - (isFree(x) ? 3 : 0) - (endsSoon(x) ? 2.5 : 0) - (x.image ? 0.5 : 0) + seeded(wk + (x.id || x.name)) * 2;
+  };
+  const best = (arr, n = 1) => arr.slice().sort((a, b) => score(a) - score(b)).slice(0, n);
+  const slots = [
+    ["🎪 축제·행사", ev.filter(e => /축제|행사/.test(e.category) && e.subtype !== "교육·체험")],
+    ["🎵 공연·음악", ev.filter(e => /공연|음악|스포츠/.test(e.category))],
+    ["🖼 전시", ev.filter(e => e.category === "전시")],
+    ["✍️ 체험·배움", ev.filter(e => e.subtype === "교육·체험" || (e.tags || []).includes("체험"))],
+    ["🌳 바깥 나들이", VENUES.filter(v => /공원|정원|자연|경관|트레킹|골목|시장/.test(v.kind || "") && days.some(d => openOn(v, isoDow(d)) !== false))],
+  ];
+  const used = new Set(), out = [];
+  for (const [label, arr] of slots) { const x = best(arr.filter(a => !used.has(a.id || a.name)))[0]; if (x) { used.add(x.id || x.name); out.push([label, x]) } }
+  // 빈 칸은 남은 일정에서 채움
+  for (const x of best(ev.filter(a => !used.has(a.id)), 5)) { if (out.length >= 5) break; used.add(x.id); out.push([x.category === "전시" ? "🖼 전시" : "✨ 이번 주말", x]) }
+  return { days, picks: out.slice(0, 5) };
+}
+function renderWeekend() {
+  const el = document.getElementById("weekendPick"); if (!el) return;
+  const { days, picks } = weekendPicks();
+  if (!picks.length) { el.innerHTML = ""; return }
+  const lab = d => `${d.slice(5).replace("-", ".")}(${DAYC[isoDow(d)]})`;
+  const range = days.map(lab).join("~");
+  const isEv = x => !!x.title;
+  el.innerHTML = `<div class="weekendBox"><div class="weekendHead"><div><span class="eyebrow">THIS WEEKEND</span><h2>🗓 이번 주말 뭐 하지?</h2><small>${range} · ${HOME ? esc(HOME.gu) + "에서 가까운 곳 위주로" : esc(RNAME()) + " 기준"} · 무료·마감 임박을 먼저 골랐어요</small></div>
+    <button class="miniBtn" type="button" onclick="shareWeekend()">📤 주말 5선 보내기</button></div>
+    <div class="weekendList">${picks.map(([label, x], i) => {
+      const when = isEv(x) ? (x.start && x.end && x.start !== x.end ? `~${x.end.slice(5).replace("-", ".")}` : x.time || "") : (x.hours || "");
+      const where = isEv(x) ? x.venue : x.district;
+      return `<button class="weekendItem" type="button" onclick="${isEv(x) ? `detail('${esc(x.id)}')` : `aiProfile('${esc(x.id)}')`}"><span class="wNo">${i + 1}</span><span><span class="wTag">${label}</span><b>${esc(isEv(x) ? x.title : x.name)}</b><small>${esc([where, when].filter(Boolean).join(" · "))}${homeTag(x)}</small></span></button>`;
+    }).join("")}</div></div>`;
+}
+window.shareWeekend = async () => {
+  const { days, picks } = weekendPicks(); if (!picks.length) return;
+  const lab = d => `${+d.slice(5, 7)}/${+d.slice(8)}(${DAYC[isoDow(d)]})`;
+  const text = `🗓 이번 주말 뭐 하지? ${days.map(lab).join("~")}\n` + picks.map(([l, x], i) => `${i + 1}. ${x.title || x.name}${x.venue ? " · " + x.venue : x.district ? " · " + x.district : ""}`).join("\n");
+  const url = SITE_URL + "#weekend";
+  try { if (navigator.share) { await navigator.share({ title: "이번 주말 뭐 하지?", text, url }); return } } catch (e) { if (e && e.name === "AbortError") return }
+  try { await navigator.clipboard.writeText(text + "\n" + url); toast("주말 5선을 복사했어요. 카톡에 붙여넣기 하세요.") } catch { prompt("아래 내용을 복사해서 보내세요", text + "\n" + url) }
+};
+
 /* ───────── 📤 공유 · ⚠ 틀린 정보 알려주기 ───────── */
 function findShared(kind, id) {
   const src = { e: ALL.EVENTS, v: ALL.VENUES, f: ALL.FOOD, c: ALL.CAFES, b: ALL.BAKERIES }[kind] || [];
@@ -4843,6 +5000,7 @@ window.reportItem = (kind, id) => {
 };
 /* 공유받은 링크(#e=… #v=…)로 들어오면 그 항목을 바로 연다 */
 function openSharedLink() {
+  if (location.hash === "#weekend") { const w = document.getElementById("weekendPick"); if (w) w.scrollIntoView({ behavior: "smooth", block: "start" }); return }
   const m = location.hash.match(/^#([evfcb])=(.+)$/); if (!m) return;
   const kind = m[1], id = decodeURIComponent(m[2]), x = findShared(kind, id); if (!x) return;
   const r = regionOfItem(x); if (r && r !== REGION && REGIONS[r]) setRegion(r);
