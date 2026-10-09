@@ -3762,9 +3762,11 @@ function libToday(l, iso = todayISO()) {
   const dow = new Date(Date.parse(iso + "T12:00:00+09:00")).getUTCDay(), Dk = DAY_KO[dow];
   const c = l.closed || "", holi = HOLIDAYS[iso];
   if (holi && /공휴일|법정|국경일/.test(c)) return { open: false, why: `${holi} 휴관` };
-  const re = new RegExp(`(^|[^째막])\\s*(매주\\s*)?${Dk}요일`);
-  if (re.test(c) && !new RegExp(`(첫|둘|셋|넷|다섯|마지막)\\S*\\s*${Dk}요일`).test(c)) return { open: false, why: `${Dk}요일 휴관` };
+  // 휴관일 표기: "매주 월요일", "월+법정공휴일", "토+일+국가지정공휴일" 등 (단, '첫째 월요일'처럼 특정 주는 제외)
+  const re = new RegExp(`(^|[+,·/\\s])(매주\\s*)?${Dk}(요일)?(?=$|[+,·/\\s])`);
+  if (re.test(c) && !new RegExp(`(첫|둘|셋|넷|다섯|마지막)\\S*\\s*${Dk}(요일)?`).test(c)) return { open: false, why: `${Dk}요일 휴관` };
   const h = holi || dow === 0 ? (l.holiday || "") : dow === 6 ? (l.saturday || l.weekday) : l.weekday;
+  if (h === "휴관") return { open: false, why: holi ? `${holi} 휴관` : dow === 0 ? "일요일 휴관" : "오늘 휴관" };
   if (!h) return { open: null, why: "운영시간 확인 필요" };
   const now = kstNow(), hm = now.getUTCHours() * 60 + now.getUTCMinutes();
   const [a, b] = h.split("~").map(t => { const [x, y] = t.split(":").map(Number); return x * 60 + (y || 0) });
