@@ -13,6 +13,9 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      PYTHONUNBUFFERED: "1"   # 진행 상황이 Actions 화면에 바로바로 보이게
 
     steps:
       - name: 저장소 파일 가져오기
@@ -31,7 +34,7 @@ jobs:
 
       - name: 동네 강좌·도서관 수집 (주 1회)
         continue-on-error: true
-        timeout-minutes: 15
+        timeout-minutes: 40
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: python scripts/collect_local.py
@@ -44,7 +47,7 @@ jobs:
 
       - name: 장소 위치·영업정보 보강 (빈칸만 채움)
         continue-on-error: true
-        timeout-minutes: 20
+        timeout-minutes: 30
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: python scripts/enrich_places.py
@@ -53,7 +56,9 @@ jobs:
         run: |
           git config user.name "gwangju-eodi-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A docs/data scripts
+          git rm -r -q --cached --ignore-unmatch scripts/__pycache__
+          git add -A docs/data
+          [ -f scripts/place_cache.json ] && git add scripts/place_cache.json
           if git diff --cached --quiet; then
             echo "변경된 데이터가 없습니다."
           else
