@@ -1,0 +1,21 @@
+{
+  "name": "오늘, 전남광주 어디로?",
+  "short_name": "오늘어디로",
+  "description": "광주·전남 동네에서 오늘 바로 즐길 전시·공연·축제·도서관·강좌를 한눈에",
+  "lang": "ko",
+  "start_url": "./?source=app",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f1e7",
+  "theme_color": "#fff3e2",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "이번 주말 뭐 하지?", "url": "./#weekend", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "동네 도서관·강좌", "url": "./#local", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
+}
