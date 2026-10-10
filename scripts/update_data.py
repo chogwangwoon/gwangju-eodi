@@ -245,8 +245,11 @@ def clean_api_text(value):
 
     text = str(value)
     text = re.sub(r"<br\s*/?>", " / ", text, flags=re.IGNORECASE)
-    text = re.sub(r"<[^>]+>", "", text)
-    text = html.unescape(text).replace("\xa0", " ")      # &middot; &#39; &amp; 등을 원래 글자로
+    # 진짜 HTML 태그만 지움 ('<집 그리고 또 다른 장소들>' 같은 제목 속 꺾쇠는 살림)
+    text = re.sub(r"</?(?:p|span|a|b|strong|em|i|u|font|div|img|ul|ol|li|h[1-6]|table|tr|td|th|tbody|thead|sup|sub)\b[^>]*>", "", text, flags=re.IGNORECASE)
+    for _ in range(2):                                     # &amp;lt; 처럼 두 번 겹친 것까지
+        text = html.unescape(text)
+    text = text.replace("\xa0", " ")                      # &middot; &#39; &amp; 등을 원래 글자로
     text = re.sub(r"\s+", " ", text)
 
     return text.strip()
@@ -869,7 +872,7 @@ def tidy_event(e):
 
 
 def title_core(t):
-    t = re.sub(r"\[[^\]]*\]|《[^》]*》|<[^>]*>|〈[^〉]*〉|\([^)]*\)", " ", t or "")
+    t = re.sub(r"\[[^\]]*\]", " ", t or "")          # [광주] 같은 지역 꼬리표만 뺌 (부제는 남겨서 다른 공연과 구분)
     return re.sub(r"^(?:20\d{2}|제?\d+회)+", "", norm_title(t))
 
 
@@ -924,11 +927,27 @@ def main():
             PREV[e["id"]] = e
 
     api_events, statuses = [], []
+    old_meta = read_json(OUT_META, {})
+    KOPIS_GAP_H = 11.5            # KOPIS 는 자주 물으면 막는다 → 하루 한 번(09:10 실행)만 묻고, 18:10 은 받아 둔 자료 사용
     for source_id, source_name, fn in [
         ("tourapi", "관광공사 행사·축제", tourapi_festivals),
         ("kopis", "KOPIS 공연", kopis_performances),
         ("culture", "문화정보원 전시·체험", culture_events),
     ]:
+        if source_id == "kopis":
+            last = old_meta.get("kopis_last_try")
+            try:
+                gap = (NOW - datetime.fromisoformat(last)).total_seconds() / 3600 if last else 99
+            except ValueError:
+                gap = 99
+            if gap < KOPIS_GAP_H and os.environ.get("KOPIS_FORCE") != "1":
+                kept = [p for p in previous if p.get("api") == "kopis" or p.get("origin") == "kopis"]
+                api_events.extend(kept)
+                statuses.append({"id": source_id, "name": source_name, "ok": True, "count": len(kept),
+                                 "message": f"하루 한 번만 받아요 · {int(gap)}시간 전 자료 {len(kept)}건 사용"})
+                log(f"⏭ {source_name}: {gap:.1f}시간 전에 물어봐서 이번엔 건너뜀 (차단 방지)")
+                continue
+            old_meta["kopis_last_try"] = NOW.isoformat(timespec="seconds")
         try:
             t0 = time.time(); log(f"▶ {source_name} 수집 시작")
             rows = fn()
@@ -960,8 +979,7 @@ def main():
         "events_count": len(merged),
         "note": "직접 확인한 일정 우선 병합 · 출처별 실패 시 지난 자료 유지",
     }
-    old_meta = read_json(OUT_META, {})
-    for k in ("local", "place_fill"):          # 다른 수집기가 남긴 기록은 유지
+    for k in ("local", "place_fill", "kopis_last_try"):   # 다른 수집기가 남긴 기록은 유지
         if k in old_meta:
             meta[k] = old_meta[k]
     write_json(OUT_META, meta)
