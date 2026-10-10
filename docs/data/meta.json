@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-10T09:33:23+09:00",
+  "updated_at": "2026-10-10T18:21:37+09:00",
   "auto_update": true,
   "sources": [
     {
@@ -12,9 +12,9 @@
     {
       "id": "kopis",
       "name": "KOPIS 공연",
-      "ok": false,
-      "count": 0,
-      "message": "수집 실패 · 지난 자료 92건 유지 (HTTP 400 Bad Request · 400 Bad Request Request Blocked)"
+      "ok": true,
+      "count": 100,
+      "message": "정상 수집"
     },
     {
       "id": "culture",
@@ -35,9 +35,9 @@
     {
       "id": "kopis",
       "name": "KOPIS 공연",
-      "ok": false,
-      "count": 0,
-      "message": "수집 실패 · 지난 자료 92건 유지 (HTTP 400 Bad Request · 400 Bad Request Request Blocked)"
+      "ok": true,
+      "count": 100,
+      "message": "정상 수집"
     },
     {
       "id": "culture",
@@ -60,7 +60,7 @@
       "name": "평생학습 강좌",
       "ok": true,
       "count": 326,
-      "fetched_at": "2026-10-10T09:35:07+09:00",
+      "fetched_at": "2026-10-10T18:23:44+09:00",
       "fields": [
         "edcColseTime",
         "edcEndDay",
@@ -95,7 +95,7 @@
       "name": "도서관",
       "ok": true,
       "count": 470,
-      "fetched_at": "2026-10-10T09:35:07+09:00",
+      "fetched_at": "2026-10-10T18:23:44+09:00",
       "fields": [
         "bookCo",
         "closeDay",
@@ -136,7 +136,7 @@
     }
   },
   "place_fill": {
-    "checked_at": "2026-10-10T09:35:08+09:00",
+    "checked_at": "2026-10-10T18:23:45+09:00",
     "tourapi_calls": 0,
     "osm_lookups": 0,
     "unfinished": false,
@@ -172,5 +172,6 @@
         "hours_filled": 0
       }
     }
-  }
+  },
+  "kopis_last_try": "2026-10-10T18:21:37+09:00"
 }
